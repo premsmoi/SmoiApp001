@@ -7,7 +7,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 
 import java.util.List;
 

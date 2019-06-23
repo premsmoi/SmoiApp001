@@ -17,7 +17,6 @@
 package com.example.smoiapp001;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.List;

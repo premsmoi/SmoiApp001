@@ -7,7 +7,7 @@ import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
 
 @Database(entities = {TransactionEntry.class}, version = 2, exportSchema = false)

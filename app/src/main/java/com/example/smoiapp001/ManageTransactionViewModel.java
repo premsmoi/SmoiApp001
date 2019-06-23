@@ -3,7 +3,7 @@ package com.example.smoiapp001;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.database.AppDatabase;
 
 public class ManageTransactionViewModel extends ViewModel {

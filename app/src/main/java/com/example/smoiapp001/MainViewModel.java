@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.util.Log;
 
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.database.AppDatabase;
 
 import java.util.List;

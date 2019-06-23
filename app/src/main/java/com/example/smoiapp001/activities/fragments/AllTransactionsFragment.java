@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.smoiapp001.MainViewModel;
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.TransactionAdapter;
 import com.example.smoiapp001.activities.MainActivity;

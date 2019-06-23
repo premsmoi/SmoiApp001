@@ -34,7 +34,7 @@ import android.widget.TextView;
 import com.example.smoiapp001.ManageTransactionViewModel;
 import com.example.smoiapp001.ManageTransactionViewModelFactory;
 import com.example.smoiapp001.AppExecutors;
-import com.example.smoiapp001.Models.TransactionEntry;
+import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.database.AppDatabase;
 
