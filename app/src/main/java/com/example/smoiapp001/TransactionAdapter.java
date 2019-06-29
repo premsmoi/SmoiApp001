@@ -25,10 +25,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.smoiapp001.models.TransactionEntry;
+import com.example.smoiapp001.utilities.DateConverter;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * This TaskAdapter creates and binds ViewHolders, that hold the description and priority of a task,
@@ -36,16 +35,12 @@ import java.util.Locale;
  */
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
-    // Constant for date format
-    private static final String DATE_FORMAT = "dd/MM/yyy";
-
     // Member variable to handle item clicks
     final private ItemClickListener mItemClickListener;
     // Class variables for the List that holds task data and the Context
     private List<TransactionEntry> mTransactionEntries;
     private Context mContext;
-    // Date formatter
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+
 
     /**
      * Constructor for the TaskAdapter that initializes the Context.
@@ -86,7 +81,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         float cost = transactionEntry.getCost();
         String costString = Float.toString(cost);
         int costTextColor;
-        String updatedAt = dateFormat.format(transactionEntry.getDate());
+        String updatedAt = DateConverter.getNormalDateFormat().format(transactionEntry.getDate());
 
         //Set values
         holder.descriptionView.setText(description);

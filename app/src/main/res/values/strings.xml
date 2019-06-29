@@ -8,6 +8,9 @@
     <string name="update_transaction_activity_name">Update Transaction</string>
     <string name="default_date">11/11/1111</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="today_cost_label">By day:</string>
+    <string name="delete_button">Delete</string>
+    <string name="monthly_cost_label">By month:</string>
+    <string name="show_all_label">Show All</string>
 </resources>

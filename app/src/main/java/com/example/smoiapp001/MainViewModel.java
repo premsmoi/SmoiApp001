@@ -24,7 +24,7 @@ public class MainViewModel extends AndroidViewModel {
         transactions = database.transactionDao().loadAllTransactions();
     }
 
-    public LiveData<List<TransactionEntry>> getTasks() {
+    public LiveData<List<TransactionEntry>> getTransactions() {
         return transactions;
     }
 }

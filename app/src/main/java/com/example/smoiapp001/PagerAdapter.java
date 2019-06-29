@@ -11,7 +11,7 @@ import com.example.smoiapp001.activities.fragments.DashboardFragment;
 // and NOT a FragmentPagerAdapter.
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
-    private final int PAGE_NUMBER = 2;
+    private final int PAGE_NUMBER = 1;
 
     public PagerAdapter(FragmentManager fm) {
         super(fm);
@@ -21,8 +21,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         if(position == 0)
             return new DashboardFragment();
-        else if(position == 1)
-            return new AllTransactionsFragment();
+        /*else if(position == 1)
+            return new AllTransactionsFragment();*/
         return null;
     }
 
@@ -36,8 +36,8 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         switch (position) {
             case 0:
                 return DashboardFragment.NAME;
-            case 1:
-                return AllTransactionsFragment.NAME;
+            /*case 1:
+                return AllTransactionsFragment.NAME;*/
              default:
                  return null;
         }

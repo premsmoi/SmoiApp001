@@ -14,7 +14,7 @@ import java.util.List;
 @Dao
 public interface TransactionDao {
 
-    @Query("SELECT * FROM `transaction` ORDER BY date")
+    @Query("SELECT * FROM `transaction` ORDER BY date DESC")
     LiveData<List<TransactionEntry>> loadAllTransactions();
 
     @Insert
@@ -23,9 +23,10 @@ public interface TransactionDao {
     @Update
     void updateTransaction(TransactionEntry transactionEntry);
 
-    @Delete
-    void deleteTransaction(TransactionEntry transactionEntry);
+    @Query("DELETE FROM `transaction` WHERE id = :id")
+    void deleteTransactionById(int id);
 
     @Query("SELECT * FROM `transaction` WHERE id = :id")
     LiveData<TransactionEntry> loadTransactionById(int id);
+
 }

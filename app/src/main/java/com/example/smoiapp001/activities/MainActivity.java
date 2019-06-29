@@ -1,5 +1,6 @@
 package com.example.smoiapp001.activities;
 
+import android.arch.lifecycle.LiveData;
 import android.graphics.Color;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
@@ -29,5 +30,4 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(pager);
 
     }
-
 }

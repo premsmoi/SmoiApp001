@@ -1,13 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.fragments.AllTransactionsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="My Dashboard" />
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        tools:context=".activities.MainActivity">
 
+        <RelativeLayout
+            android:id="@+id/overall_section_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/layout_horizontal_margin">
+
+            <Button
+                android:id="@+id/bt_selected_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/layout_horizontal_margin"
+                android:layout_marginVertical="@dimen/layout_vertical_margin"
+                android:layout_alignParentStart="true"
+                android:textSize="@dimen/normal_text_size"
+                android:text="DD/MM/YYYY" />
+
+            <LinearLayout
+                android:id="@+id/cost_label_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginHorizontal="@dimen/layout_horizontal_margin"
+                android:layout_marginVertical="@dimen/layout_vertical_margin"
+                android:layout_toLeftOf="@+id/cost_layout">
+
+                <TextView
+                    android:id="@+id/tv_daily_cost_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/layout_horizontal_margin"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="@string/today_cost_label" />
+
+                <TextView
+                    android:id="@+id/tv_month_cost_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/layout_horizontal_margin"
+                    android:layout_marginTop="@dimen/layout_vertical_margin"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="@string/monthly_cost_label" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cost_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginEnd="@dimen/layout_horizontal_margin"
+                android:layout_alignParentEnd="true">
+
+                <TextView
+                    android:id="@+id/tv_daily_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:textSize="@dimen/Large_text_size"
+                    android:text="0" />
+
+                <TextView
+                    android:id="@+id/tv_monthly_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:textSize="@dimen/Large_text_size"
+                    android:text="0" />
+
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/checkbox_show_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bt_selected_date"
+                android:text="@string/show_all_label" />
+
+        </RelativeLayout>
+
+        <!-- RecyclerView that is responsible for holding a list of Transaction Entry data -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewDailyTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
+
+        <!-- Floating action button that launches ManageTransactionActivity when clicked -->
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:tint="@android:color/white"
+        app:srcCompat="@android:drawable/ic_input_add" />
 </FrameLayout>
+
