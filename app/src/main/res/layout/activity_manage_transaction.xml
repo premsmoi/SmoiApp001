@@ -3,6 +3,7 @@
     This includes an EditText to adtaskEntrytask description, and buttons to select a priority
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/manage_transaction_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"

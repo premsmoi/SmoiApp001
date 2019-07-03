@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,11 +30,13 @@ import com.example.smoiapp001.activities.MainActivity;
 import com.example.smoiapp001.activities.ManageTransactionActivity;
 import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.TransactionUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
@@ -46,14 +47,17 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private View fragmentView;
-    private TextView dailyCostTextView;
-    private TextView monthlyCostTextView;
+    private TextView dayCostTextView;
+    private TextView monthCostTextView;
     private Button selectDateButton;
     private CheckBox showAllCheckBox;
+    private FloatingActionButton fabButton;
 
     private RecyclerView mRecyclerView;
     private TransactionAdapter mAdapter;
     private ArrayList<String> descriptionList;
+    private MainViewModel viewModel;
+    private Calendar selectedCalendar;
 
     public static final int REQUEST_CODE = 11; // Used to identify the result
 
@@ -68,10 +72,6 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
             selectDateButton.setText(savedInstanceState.getString("selectedDate"));
         }
 
-        initCosts();
-
-        // Set the RecyclerView to its corresponding view
-        mRecyclerView = fragmentView.findViewById(R.id.recyclerViewDailyTransactions);
         // Set the layout for the RecyclerView to be a linear layout, which measures and
         // positions items within a RecyclerView into a linear list
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -80,21 +80,12 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
         mAdapter = new TransactionAdapter(getContext(), this);
         mRecyclerView.setAdapter(mAdapter);
 
+        viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
         DividerItemDecoration decoration = new DividerItemDecoration(getContext().getApplicationContext(), VERTICAL);
         mRecyclerView.addItemDecoration(decoration);
 
-        FloatingActionButton fabButton = fragmentView.findViewById(R.id.fab);
-        fabButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Create a new intent to start an ManageTransactionActivity
-                Intent addTransactionIntent = new Intent(getContext(), ManageTransactionActivity.class);
-                addTransactionIntent.putExtra(ManageTransactionActivity.EXTRA_DESCRIPTION_LIST, descriptionList);
-                startActivity(addTransactionIntent);
-            }
-        });
-
-        descriptionList = new ArrayList<String>();
+        descriptionList = new ArrayList<>();
         setupViewModel();
 
         return fragmentView;
@@ -106,8 +97,10 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
     }
 
     private void initViews() {
-        dailyCostTextView = fragmentView.findViewById(R.id.tv_daily_cost);
-        monthlyCostTextView = fragmentView.findViewById(R.id.tv_monthly_cost);
+        /* Set the RecyclerView to its corresponding view */
+        mRecyclerView = fragmentView.findViewById(R.id.recyclerViewDailyTransactions);
+        dayCostTextView = fragmentView.findViewById(R.id.tv_daily_cost);
+        monthCostTextView = fragmentView.findViewById(R.id.tv_monthly_cost);
         showAllCheckBox = fragmentView.findViewById(R.id.checkbox_show_all);
         showAllCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -123,109 +116,98 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
                 showDatePickerDialog();
             }
         });
-    }
-
-    private void initCosts(){
-        calculateCost();
+        fabButton = fragmentView.findViewById(R.id.fab);
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Create a new intent to start an ManageTransactionActivity
+                Intent addTransactionIntent = new Intent(getContext(), ManageTransactionActivity.class);
+                addTransactionIntent.putExtra(ManageTransactionActivity.EXTRA_DESCRIPTION_LIST, descriptionList);
+                startActivity(addTransactionIntent);
+            }
+        });
     }
 
     private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         viewModel.getTransactions().observe(this, new Observer<List<TransactionEntry>>() {
             @Override
             public void onChanged(@Nullable List<TransactionEntry> transactionEntries) {
-                ArrayList<TransactionEntry> selectedEntries = new ArrayList<TransactionEntry>();
-                SimpleDateFormat sdf = DateConverter.getNormalDateFormat();
-                String selectedDate = selectDateButton.getText().toString();
-                for (TransactionEntry transactionEntry: transactionEntries) {
-                    String newDescription = transactionEntry.getDescription();
-                    if (!descriptionList.contains(newDescription)) {
-                        descriptionList.add(newDescription);
-                    }
-                    String entryDate = sdf.format(transactionEntry.getDate());
-                    if (entryDate.equals(selectedDate)) {
-                        selectedEntries.add(transactionEntry);
-                    }
-                }
-                Log.d(TAG, "Updating list of transactions from LiveData in ViewModel");
+                ArrayList<TransactionEntry> selectedEntries;
+                Calendar selectedCalendar = getSelectedCalendar();
+                descriptionList = TransactionUtils.getDescriptionList(transactionEntries);
+
                 if (!showAllCheckBox.isChecked()) {
+                    selectedEntries = TransactionUtils.getTransactionByDate(transactionEntries, selectedCalendar);
                     mAdapter.setTransactions(selectedEntries);
                 } else {
                     mAdapter.setTransactions(transactionEntries);
                 }
+                setDayCostView(TransactionUtils.calculateDayCost(transactionEntries, selectedCalendar));
+                setMonthCostView(TransactionUtils.calculateMonthCost(transactionEntries, selectedCalendar));
             }
+
         });
     }
 
-    private void setDailyCostView(Float dayCost) {
-        String dayCostString = Float.toString(dayCost);
+    private void setDayCostView(Float dayCost) {
+        String dayCostString = String.format(Locale.US,"%.2f", dayCost);
 
         if (dayCost < 0) {
-            dailyCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+            dayCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
         } else {
-            dailyCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
+            dayCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
             dayCostString = "+" + dayCostString;
         }
-        dailyCostTextView.setText(dayCostString);
+        dayCostTextView.setText(dayCostString);
     }
 
-    private void setMonthlyCostView(Float monthCost) {
-        String monthCostString = Float.toString(monthCost);
+    private void setMonthCostView(Float monthCost) {
+        String monthCostString = String.format(Locale.US,"%.2f", monthCost);
 
         if (monthCost < 0) {
-            monthlyCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+            monthCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
         } else {
-            monthlyCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
+            monthCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
             monthCostString = "+" + monthCostString;
         }
-        monthlyCostTextView.setText(monthCostString);
-    }
-
-    private void setSelectedDate(String date) {
-        selectDateButton.setText(date);
-    }
-
-    private void calculateCost() {
-        MainViewModel viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.getTransactions().observe(this, new Observer<List<TransactionEntry>>() {
-            float dailySum = 0;
-            float monthlySum = 0;
-            SimpleDateFormat sdf = new SimpleDateFormat(DateConverter.DATE_FORMAT_NORMAL);
-            /*String todayString = sdf.format(new Date());*/
-            String todayString = selectDateButton.getText().toString();
-            String monthString = todayString.substring(3, 10);
-            @Override
-            public void onChanged(@Nullable List<TransactionEntry> transactionEntries) {
-                Log.i("Month", monthString);
-                for (TransactionEntry transaction : transactionEntries) {
-                    String transactionDateString = sdf.format(transaction.getDate());
-                    String transactionMonthString = transactionDateString.substring(3, 10);
-                    if (todayString.equals(transactionDateString)) {
-                        dailySum += transaction.getCost();
-                        //Log.i("Cost", ""+transaction.getCost());
-                    }
-                    if (monthString.equals(transactionMonthString)) {
-                        monthlySum += transaction.getCost();
-                        //Log.i("Cost", ""+transaction.getCost());
-                    }
-                }
-                setDailyCostView(dailySum);
-                setMonthlyCostView(monthlySum);
-                dailySum = 0;
-                monthlySum = 0;
-            }
-        });
+        monthCostTextView.setText(monthCostString);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-           String selectedDateString = data.getStringExtra("selectedDate");
-           setSelectedDate(selectedDateString);
-           calculateCost();
-           setupViewModel();
+            int[] result;
+            result = data.getIntArrayExtra("selectedDate");
+            String selectedDateString = DateConverter.
+                    buildNormalDateString(result[0], result[1], result[2]);
+
+            selectDateButton.setText(selectedDateString);
+            Calendar selectedCalendar = getSelectedCalendar();
+            setDayCostView(TransactionUtils.calculateDayCost(
+                    viewModel.getTransactions().getValue(),
+                    selectedCalendar));
+            setMonthCostView(TransactionUtils.calculateMonthCost(
+                   viewModel.getTransactions().getValue(),
+                   selectedCalendar));
+            setupViewModel();
+
+            /*Log.i("selectedDate", selectedDateString);
+            Log.i("Set Day Cost", ""+TransactionUtils.calculateDayCost(
+                    viewModel.getTransactions().getValue(),
+                    selectedCalendar));
+            Log.i("Set Month Cost", ""+TransactionUtils.calculateMonthCost(
+                    viewModel.getTransactions().getValue(),
+                    selectedCalendar));*/
         }
+    }
+
+    public Calendar getSelectedCalendar() {
+        String selectedDateString = selectDateButton.getText().toString();
+        selectedCalendar = Calendar.getInstance();
+        selectedCalendar.set(DateConverter.getYearByNormalFormat(selectedDateString),
+                DateConverter.getMonthByNormalFormat(selectedDateString),
+                DateConverter.getDayByNormalFormat(selectedDateString));
+        return selectedCalendar;
     }
 
     public void showDatePickerDialog() {
@@ -246,6 +228,7 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
         Intent intent = new Intent(getContext(), ManageTransactionActivity.class);
         intent.putExtra(ManageTransactionActivity.EXTRA_TRANSACTION_ID, itemId);
         intent.putExtra(ManageTransactionActivity.EXTRA_DESCRIPTION_LIST, descriptionList);
+        Log.i("Intent", "Go to ManageTransactionActivity");
         startActivity(intent);
     }
 }

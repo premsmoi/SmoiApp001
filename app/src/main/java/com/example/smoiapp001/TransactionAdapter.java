@@ -28,6 +28,7 @@ import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This TaskAdapter creates and binds ViewHolders, that hold the description and priority of a task,
@@ -79,7 +80,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         TransactionEntry transactionEntry = mTransactionEntries.get(position);
         String description = transactionEntry.getDescription();
         float cost = transactionEntry.getCost();
-        String costString = Float.toString(cost);
+        String costString = String.format(Locale.US,"%.2f", cost);
         int costTextColor;
         String updatedAt = DateConverter.getNormalDateFormat().format(transactionEntry.getDate());
 

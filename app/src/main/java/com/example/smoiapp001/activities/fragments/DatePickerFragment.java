@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -31,8 +32,6 @@ public class DatePickerFragment extends DialogFragment
             int year = mBundle.getInt("year");
             int month = mBundle.getInt("month");
             int day = mBundle.getInt("day");
-            month--;
-            Log.i("Test", "old");
             // Create a new instance of DatePickerDialog using old values and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
@@ -41,7 +40,6 @@ public class DatePickerFragment extends DialogFragment
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            Log.i("Test", "default");
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
 
@@ -49,7 +47,7 @@ public class DatePickerFragment extends DialogFragment
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
 
-        month++;
+       /* month++;
         String dayString = Integer.toString(day);
         String monthString = Integer.toString(month);
 
@@ -59,12 +57,19 @@ public class DatePickerFragment extends DialogFragment
 
         if (month < 10) {
             monthString = "0" + monthString;
-        }
-        String formedDate = dayString + "/" + monthString + "/" + year;
+        }*/
+        //ArrayList<Integer> selectedDate = new ArrayList<>();
+        int[] selectedDate = new int[3];
+        selectedDate[0] = year;
+        selectedDate[1] = month;
+        selectedDate[2] = day;
+
+        /*String formedDate = dayString + "/" + monthString + "/" + year;*/
         getTargetFragment().onActivityResult(
                 getTargetRequestCode(),
                 Activity.RESULT_OK,
-                new Intent().putExtra("selectedDate", formedDate)
+                new Intent().putExtra("selectedDate", selectedDate)
+                /*new Intent().putExtra("selectedDate", formedDate)*/
         );
     }
 }

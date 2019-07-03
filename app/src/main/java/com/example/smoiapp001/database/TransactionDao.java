@@ -27,6 +27,6 @@ public interface TransactionDao {
     void deleteTransactionById(int id);
 
     @Query("SELECT * FROM `transaction` WHERE id = :id")
-    LiveData<TransactionEntry> loadTransactionById(int id);
+    TransactionEntry loadTransactionById(int id);
 
 }

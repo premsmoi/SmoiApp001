@@ -1,27 +1,25 @@
 /*
-* Copyright (C) 2016 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.example.smoiapp001.activities;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -29,12 +27,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
-import com.example.smoiapp001.ManageTransactionViewModel;
-import com.example.smoiapp001.ManageTransactionViewModelFactory;
 import com.example.smoiapp001.AppExecutors;
 import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.R;
@@ -43,6 +40,7 @@ import com.example.smoiapp001.utilities.DateConverter;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class ManageTransactionActivity extends AppCompatActivity {
@@ -67,15 +65,17 @@ public class ManageTransactionActivity extends AppCompatActivity {
     // Constant for logging
     private static final String TAG = ManageTransactionActivity.class.getSimpleName();
     // Fields for views
-    /*EditText mEditTextDescription;*/
-    AutoCompleteTextView mEditTextDescription;
-    EditText mEditTextCost;
-    RadioGroup mRadioGroupType;
-    TextView mTextViewDate;
-    Button mActionButton;
-    Button mDeleteButton;
+    private LinearLayout mLinearLayout;
+    private AutoCompleteTextView mEditTextDescription;
+    private EditText mEditTextCost;
+    private RadioGroup mRadioGroupType;
+    private TextView mTextViewDate;
+    private Button mActionButton;
+    private Button mDeleteButton;
 
     private int mTransactionId = DEFAULT_TRANSACTION_ID;
+
+    private TransactionEntry transaction;
 
     // Member variable for the Database
     private AppDatabase mDb;
@@ -90,38 +90,13 @@ public class ManageTransactionActivity extends AppCompatActivity {
 
         mDb = AppDatabase.getInstance(getApplicationContext());
 
-        /*if (savedInstanceState != null && savedInstanceState.containsKey(INSTANCE_TRANSACTION_ID)) {
-            mTransactionId = savedInstanceState.getInt(INSTANCE_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
-        }*/
-
         Intent intent = getIntent();
         if (intent != null) {
             if (intent.hasExtra(EXTRA_TRANSACTION_ID)) {
+                mLinearLayout.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.update_transaction_activity_name);
                 mActionButton.setText(R.string.update_button);
-                if (mTransactionId == DEFAULT_TRANSACTION_ID) {
-                    // populate the UI
-                    mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
-
-                    ManageTransactionViewModelFactory factory = new ManageTransactionViewModelFactory(mDb, mTransactionId);
-                    final ManageTransactionViewModel viewModel
-                            = ViewModelProviders.of(this, factory).get(ManageTransactionViewModel.class);
-
-                    viewModel.getTransaction().observe(this, new Observer<TransactionEntry>() {
-                        @Override
-                        public void onChanged(@Nullable TransactionEntry transactionEntry) {
-                            viewModel.getTransaction().removeObserver(this);
-                            populateUI(transactionEntry);
-                            if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
-                                    >= TRANSACTION_TIMEOUT_PERIOD) {
-                                String costString = mEditTextCost.getText().toString();
-                                costString += " THB";
-                                mEditTextCost.setText(costString);
-                                lockTransaction();
-                            }
-                        }
-                    });
-                }
+                loadTransactionById(intent);
             }
             if (intent.hasExtra(EXTRA_DESCRIPTION_LIST)) {
                 descriptionList = intent.getStringArrayListExtra(EXTRA_DESCRIPTION_LIST);
@@ -132,8 +107,35 @@ public class ManageTransactionActivity extends AppCompatActivity {
                 android.R.layout.simple_dropdown_item_1line, descriptionList);
         mEditTextDescription.setAdapter(arrayAdapter);
 
-        Log.i("List", descriptionList.toString());
+        /*Log.i("List", descriptionList.toString());*/
 
+    }
+
+    private void loadTransactionById(Intent intent) {
+        if (mTransactionId == DEFAULT_TRANSACTION_ID) {
+            mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
+            new loadTransactionById().execute(mTransactionId);
+        }
+    }
+
+    private class loadTransactionById extends AsyncTask<Integer, Integer, TransactionEntry> {
+
+        @Override
+        protected TransactionEntry doInBackground(Integer... integers) {
+            TransactionEntry transactionEntry = mDb.transactionDao().loadTransactionById(mTransactionId);
+            return transactionEntry;
+        }
+
+        @Override
+        protected void onPostExecute(TransactionEntry transactionEntry) {
+            setTransaction(transactionEntry);
+            populateUI(transactionEntry);
+            if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
+                    >= TRANSACTION_TIMEOUT_PERIOD) {
+                lockTransaction();
+            }
+            mLinearLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -146,7 +148,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
      * initViews is called from onCreate to init the member variable views
      */
     private void initViews() {
-        /*mEditTextDescription = findViewById(R.id.et_transaction_description);*/
+        mLinearLayout = findViewById(R.id.manage_transaction_layout);
         mEditTextDescription = findViewById(R.id.actv_transaction_description);
         mEditTextCost = findViewById(R.id.et_transaction_cost);
         mTextViewDate = findViewById(R.id.tv_transaction_date);
@@ -169,7 +171,10 @@ public class ManageTransactionActivity extends AppCompatActivity {
         });
     }
 
-    private void lockTransaction(){
+    private void lockTransaction() {
+        String costString = mEditTextCost.getText().toString();
+        costString += " THB";
+        mEditTextCost.setText(costString);
         mEditTextDescription.setFocusable(false);
         mEditTextDescription.setBackgroundColor(Color.TRANSPARENT);
         mEditTextCost.setFocusable(false);
@@ -177,8 +182,10 @@ public class ManageTransactionActivity extends AppCompatActivity {
         mActionButton.setVisibility(View.INVISIBLE);
         mDeleteButton.setVisibility(View.INVISIBLE);
 
-        int checkedIndex = mRadioGroupType.indexOfChild(findViewById(
+        int checkedIndex = mRadioGroupType.indexOfChild(
+                mRadioGroupType.findViewById(
                 mRadioGroupType.getCheckedRadioButtonId()));
+        Log.i(TAG, "checkedIndex: "+checkedIndex);
         for (int i = 0; i < mRadioGroupType.getChildCount(); i++) {
             if (i != checkedIndex) {
                 mRadioGroupType.getChildAt(i).setEnabled(false);
@@ -191,13 +198,12 @@ public class ManageTransactionActivity extends AppCompatActivity {
      *
      * @param transaction the taskEntry to populate the UI
      */
-    private void  populateUI(TransactionEntry transaction) {
+    private void populateUI(TransactionEntry transaction) {
         if (transaction == null) {
             return;
         }
-
         mEditTextDescription.setText(transaction.getDescription());
-        mEditTextCost.setText(Float.toString(Math.abs(transaction.getCost())));
+        mEditTextCost.setText(String.format(Locale.US,"%.2f", Math.abs(transaction.getCost())));
         mTextViewDate.setText(DateConverter.getObviousDateFormat().format(transaction.getDate()));
 
         String type = EXPENSE_TRANSACTION_TYPE;
@@ -273,13 +279,17 @@ public class ManageTransactionActivity extends AppCompatActivity {
     public void setTransactionTypeInViews(String type) {
         switch (type) {
             case EXPENSE_TRANSACTION_TYPE:
-                ((RadioGroup) findViewById(R.id.radioGroup)).check(R.id.radButton1);
+                mRadioGroupType.check(R.id.radButton1);
                 break;
             case INCOME_TRANSACTION_TYPE:
-                ((RadioGroup) findViewById(R.id.radioGroup)).check(R.id.radButton2);
+                mRadioGroupType.check(R.id.radButton2);
                 break;
             default:
-                ((RadioGroup) findViewById(R.id.radioGroup)).check(R.id.radButton1);
+                mRadioGroupType.check(R.id.radButton1);
         }
+    }
+
+    public void setTransaction(TransactionEntry transaction) {
+        this.transaction = transaction;
     }
 }

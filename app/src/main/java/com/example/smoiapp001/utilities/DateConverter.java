@@ -4,6 +4,7 @@ import android.arch.persistence.room.TypeConverter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -39,14 +40,16 @@ public class DateConverter {
     }
 
     public static int getMonthByNormalFormat(String date) {
-        String month;
+        String monthString;
         if (date.substring(3,4).equals("0")) {
-            month = date.substring(4,5);
+            monthString = date.substring(4,5);
         }
         else {
-            month = date.substring(3,5);
+            monthString = date.substring(3,5);
         }
-        return Integer.parseInt(month);
+        int month = Integer.parseInt(monthString);
+        month--;
+        return month;
     }
 
     public static int getYearByNormalFormat(String date) {
@@ -65,5 +68,21 @@ public class DateConverter {
         return new SimpleDateFormat(DateConverter.DATE_FORMAT_OBVIOUS, Locale.getDefault());
     }
 
+    public static String buildNormalDateString(int year, int month, int day) {
+        month++;
+        String dayString = Integer.toString(day);
+        String monthString = Integer.toString(month);
+
+        if (day < 10) {
+            dayString = "0" + dayString;
+        }
+
+        if (month < 10) {
+            monthString = "0" + monthString;
+        }
+        String formedDate = dayString + "/" + monthString + "/" + year;
+
+        return formedDate;
+    }
 
 }
