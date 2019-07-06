@@ -75,6 +75,7 @@ public class DashboardFragment extends Fragment implements TransactionAdapter.It
         // Set the layout for the RecyclerView to be a linear layout, which measures and
         // positions items within a RecyclerView into a linear list
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
 
         // Initialize the adapter and attach it to the RecyclerView
         mAdapter = new TransactionAdapter(getContext(), this);

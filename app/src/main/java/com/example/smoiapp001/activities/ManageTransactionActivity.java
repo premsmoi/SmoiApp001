@@ -16,10 +16,15 @@
 
 package com.example.smoiapp001.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -43,21 +48,22 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class ManageTransactionActivity extends AppCompatActivity {
+public class ManageTransactionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<TransactionEntry> {
 
-    // Constants for transaction type
+    // Constants for mTransaction type
     private static final String EXPENSE_TRANSACTION_TYPE = "expense";
     private static final String INCOME_TRANSACTION_TYPE = "income";
 
-    // Constant for transaction timeout, 1 day
+    // Constant for mTransaction timeout, 1 day
     private static final long TRANSACTION_TIMEOUT_PERIOD = DateConverter.DAY_IN_MILLISECOND;
 
+    private static final int TRANSACTION_LOADER_ID = 21;
 
-    // Extra for the transaction ID to be received in the intent
+    // Extra for the mTransaction ID to be received in the intent
     public static final String EXTRA_TRANSACTION_ID = "extraTransactionId";
     // Extra for the description list to be received in the intent
     public static final String EXTRA_DESCRIPTION_LIST = "extraDescriptionList";
-    // Extra for the transaction ID to be received after rotation
+    // Extra for the mTransaction ID to be received after rotation
     public static final String INSTANCE_TRANSACTION_ID = "instanceTransactionId";
 
     // Constant for default task id to be used when not in update mode
@@ -75,7 +81,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
 
     private int mTransactionId = DEFAULT_TRANSACTION_ID;
 
-    private TransactionEntry transaction;
+    private TransactionEntry mTransaction;
 
     // Member variable for the Database
     private AppDatabase mDb;
@@ -85,7 +91,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_transaction);
-        Log.i("Debug", "In ManageTransactionActivity");
+        Log.i(TAG, "In ManageTransactionActivity");
         initViews();
 
         mDb = AppDatabase.getInstance(getApplicationContext());
@@ -114,28 +120,60 @@ public class ManageTransactionActivity extends AppCompatActivity {
     private void loadTransactionById(Intent intent) {
         if (mTransactionId == DEFAULT_TRANSACTION_ID) {
             mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
-            new loadTransactionById().execute(mTransactionId);
+            getSupportLoaderManager().initLoader(TRANSACTION_LOADER_ID,
+                    null, this).startLoading();
         }
     }
 
-    private class loadTransactionById extends AsyncTask<Integer, Integer, TransactionEntry> {
+    @NonNull
+    @Override
+    public Loader<TransactionEntry> onCreateLoader(int id, @Nullable Bundle bundle) {
+        if (id == TRANSACTION_LOADER_ID) {
+            return new LoadTransactionById(ManageTransactionActivity.this, mDb, mTransactionId);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<TransactionEntry> loader, TransactionEntry transactionEntry) {
+        mTransaction = transactionEntry;
+        populateUI(transactionEntry);
+        if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
+                >= TRANSACTION_TIMEOUT_PERIOD) {
+            lockTransaction();
+        }
+        mLinearLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<TransactionEntry> loader) {
+        mTransaction = null;
+    }
+
+    private static class LoadTransactionById extends AsyncTaskLoader<TransactionEntry> {
+        private AppDatabase db;
+        private Integer id;
+
+        public LoadTransactionById(@NonNull Context context, AppDatabase db, Integer id ) {
+            super(context);
+            this.db = db;
+            this.id = id;
+        }
 
         @Override
-        protected TransactionEntry doInBackground(Integer... integers) {
-            TransactionEntry transactionEntry = mDb.transactionDao().loadTransactionById(mTransactionId);
+        protected void onStartLoading() {
+            super.onStartLoading();
+            forceLoad();
+        }
+
+        @Nullable
+        @Override
+        public TransactionEntry loadInBackground() {
+            Log.i(TAG, "Load in background");
+            TransactionEntry transactionEntry = db.transactionDao().loadTransactionById(id);
             return transactionEntry;
         }
 
-        @Override
-        protected void onPostExecute(TransactionEntry transactionEntry) {
-            setTransaction(transactionEntry);
-            populateUI(transactionEntry);
-            if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
-                    >= TRANSACTION_TIMEOUT_PERIOD) {
-                lockTransaction();
-            }
-            mLinearLayout.setVisibility(View.VISIBLE);
-        }
     }
 
     @Override
@@ -234,10 +272,10 @@ public class ManageTransactionActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (mTransactionId == DEFAULT_TRANSACTION_ID) {
-                    // insert new transaction
+                    // insert new mTransaction
                     mDb.transactionDao().insertTransaction(transaction);
                 } else {
-                    //update transaction
+                    //update mTransaction
                     transaction.setId(mTransactionId);
                     mDb.transactionDao().updateTransaction(transaction);
                 }
@@ -251,7 +289,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (mTransactionId != DEFAULT_TRANSACTION_ID) {
-                    // delete selected transaction
+                    // delete selected mTransaction
                     Log.i("onDeleteButtonClicked", "Delete");
                     mDb.transactionDao().deleteTransactionById(mTransactionId);
                 }
@@ -289,7 +327,4 @@ public class ManageTransactionActivity extends AppCompatActivity {
         }
     }
 
-    public void setTransaction(TransactionEntry transaction) {
-        this.transaction = transaction;
-    }
 }
