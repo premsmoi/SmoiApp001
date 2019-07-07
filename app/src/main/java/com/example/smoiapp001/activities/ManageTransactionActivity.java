@@ -137,7 +137,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
     @Override
     public void onLoadFinished(@NonNull Loader<TransactionEntry> loader, TransactionEntry transactionEntry) {
         mTransaction = transactionEntry;
-        populateUI(transactionEntry);
+        populateUI(mTransaction);
         if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
                 >= TRANSACTION_TIMEOUT_PERIOD) {
             lockTransaction();
