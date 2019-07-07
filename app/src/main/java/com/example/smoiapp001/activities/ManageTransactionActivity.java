@@ -16,18 +16,19 @@
 
 package com.example.smoiapp001.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -38,6 +39,8 @@ import android.widget.TextView;
 
 
 import com.example.smoiapp001.AppExecutors;
+import com.example.smoiapp001.activities.fragments.LoadPopularCost;
+import com.example.smoiapp001.activities.fragments.LoadTransactionById;
 import com.example.smoiapp001.models.TransactionEntry;
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.database.AppDatabase;
@@ -48,7 +51,7 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class ManageTransactionActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<TransactionEntry> {
+public class ManageTransactionActivity extends AppCompatActivity {
 
     // Constants for mTransaction type
     private static final String EXPENSE_TRANSACTION_TYPE = "expense";
@@ -58,6 +61,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
     private static final long TRANSACTION_TIMEOUT_PERIOD = DateConverter.DAY_IN_MILLISECOND;
 
     private static final int TRANSACTION_LOADER_ID = 21;
+    private static final int POPULAR_COST_LOADER_ID = 22;
 
     // Extra for the mTransaction ID to be received in the intent
     public static final String EXTRA_TRANSACTION_ID = "extraTransactionId";
@@ -65,6 +69,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
     public static final String EXTRA_DESCRIPTION_LIST = "extraDescriptionList";
     // Extra for the mTransaction ID to be received after rotation
     public static final String INSTANCE_TRANSACTION_ID = "instanceTransactionId";
+    public static final String EXTRA_DESCRIPTION_KEYWORD = "description-keyword";
 
     // Constant for default task id to be used when not in update mode
     private static final int DEFAULT_TRANSACTION_ID = -1;
@@ -86,7 +91,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
     // Member variable for the Database
     private AppDatabase mDb;
 
-    private ArrayList<String> descriptionList = new ArrayList<String>();
+    private ArrayList<String> descriptionList = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,70 +114,11 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
             }
         }
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, descriptionList);
         mEditTextDescription.setAdapter(arrayAdapter);
 
         /*Log.i("List", descriptionList.toString());*/
-
-    }
-
-    private void loadTransactionById(Intent intent) {
-        if (mTransactionId == DEFAULT_TRANSACTION_ID) {
-            mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
-            getSupportLoaderManager().initLoader(TRANSACTION_LOADER_ID,
-                    null, this).startLoading();
-        }
-    }
-
-    @NonNull
-    @Override
-    public Loader<TransactionEntry> onCreateLoader(int id, @Nullable Bundle bundle) {
-        if (id == TRANSACTION_LOADER_ID) {
-            return new LoadTransactionById(ManageTransactionActivity.this, mDb, mTransactionId);
-        }
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<TransactionEntry> loader, TransactionEntry transactionEntry) {
-        mTransaction = transactionEntry;
-        populateUI(mTransaction);
-        if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
-                >= TRANSACTION_TIMEOUT_PERIOD) {
-            lockTransaction();
-        }
-        mLinearLayout.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<TransactionEntry> loader) {
-        mTransaction = null;
-    }
-
-    private static class LoadTransactionById extends AsyncTaskLoader<TransactionEntry> {
-        private AppDatabase db;
-        private Integer id;
-
-        public LoadTransactionById(@NonNull Context context, AppDatabase db, Integer id ) {
-            super(context);
-            this.db = db;
-            this.id = id;
-        }
-
-        @Override
-        protected void onStartLoading() {
-            super.onStartLoading();
-            forceLoad();
-        }
-
-        @Nullable
-        @Override
-        public TransactionEntry loadInBackground() {
-            Log.i(TAG, "Load in background");
-            TransactionEntry transactionEntry = db.transactionDao().loadTransactionById(id);
-            return transactionEntry;
-        }
 
     }
 
@@ -190,17 +136,42 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
         mEditTextDescription = findViewById(R.id.actv_transaction_description);
         mEditTextCost = findViewById(R.id.et_transaction_cost);
         mTextViewDate = findViewById(R.id.tv_transaction_date);
-
         mRadioGroupType = findViewById(R.id.radioGroup);
-
         mActionButton = findViewById(R.id.saveButton);
+        mDeleteButton = findViewById(R.id.deleteButton);
+
+        mEditTextDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mEditTextCost.setText(null);
+            }
+        });
+
+        mEditTextDescription.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "Selected!");
+                loadRecommendedCost();
+            }
+        });
+
         mActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onSaveButtonClicked();
             }
         });
-        mDeleteButton = findViewById(R.id.deleteButton);
+
         mDeleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,7 +226,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
      * onSaveButtonClicked is called when the "save" button is clicked.
      * It retrieves user input and inserts that new task data into the underlying database.
      */
-    public void onSaveButtonClicked() {
+    private void onSaveButtonClicked() {
         String description = mEditTextDescription.getText().toString();
         float cost = Float.parseFloat(mEditTextCost.getText().toString());
         Date date = new Date();
@@ -263,8 +234,6 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
 
         if (type.equals(EXPENSE_TRANSACTION_TYPE)) {
             cost *= -1;
-        } else {
-            /* Do nothing */
         }
 
         final TransactionEntry transaction = new TransactionEntry(description, cost, date);
@@ -284,7 +253,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
         });
     }
 
-    public void onDeleteButtonClicked() {
+    private void onDeleteButtonClicked() {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -298,7 +267,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
         });
     }
 
-    public String getTransactionTypeFromViews() {
+    private String getTransactionTypeFromViews() {
         String type;
         int checkedId = mRadioGroupType.getCheckedRadioButtonId();
         switch (checkedId) {
@@ -314,7 +283,7 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
         return type;
     }
 
-    public void setTransactionTypeInViews(String type) {
+    private void setTransactionTypeInViews(String type) {
         switch (type) {
             case EXPENSE_TRANSACTION_TYPE:
                 mRadioGroupType.check(R.id.radButton1);
@@ -326,5 +295,71 @@ public class ManageTransactionActivity extends AppCompatActivity implements Load
                 mRadioGroupType.check(R.id.radButton1);
         }
     }
+
+    private void loadTransactionById(Intent intent) {
+        if (mTransactionId == DEFAULT_TRANSACTION_ID) {
+            mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
+            android.support.v4.app.LoaderManager.getInstance(this).initLoader(TRANSACTION_LOADER_ID,
+                    null, transactionLoaderListener);
+        }
+    }
+
+    private void loadRecommendedCost() {
+        String keyword = mEditTextDescription.getText().toString();
+        keyword = "%" + keyword + "%";
+        Log.i("keyword", keyword);
+        Bundle bundle = new Bundle();
+        bundle.putString(EXTRA_DESCRIPTION_KEYWORD, keyword);
+        android.support.v4.app.LoaderManager.getInstance(this).restartLoader(POPULAR_COST_LOADER_ID,
+                bundle, popularCostLoaderListener);
+    }
+
+    private LoaderManager.LoaderCallbacks<TransactionEntry> transactionLoaderListener
+            = new LoaderManager.LoaderCallbacks<TransactionEntry>() {
+        @NonNull
+        @Override
+        public Loader<TransactionEntry> onCreateLoader(int id, @Nullable Bundle bundle) {
+            return new LoadTransactionById(ManageTransactionActivity.this, mDb, mTransactionId);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<TransactionEntry> loader, TransactionEntry transactionEntry) {
+            mTransaction = transactionEntry;
+            populateUI(mTransaction);
+            if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
+                    >= TRANSACTION_TIMEOUT_PERIOD) {
+                lockTransaction();
+            }
+            mLinearLayout.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<TransactionEntry> loader) {
+            mTransaction = null;
+        }
+    };
+
+    private LoaderManager.LoaderCallbacks<Float> popularCostLoaderListener
+            = new LoaderManager.LoaderCallbacks<Float>() {
+        @NonNull
+        @Override
+        public Loader<Float> onCreateLoader(int id, @Nullable Bundle bundle) {
+            String keyword = "???";
+            if (bundle != null && bundle.containsKey(EXTRA_DESCRIPTION_KEYWORD)) {
+                keyword = bundle.getString(EXTRA_DESCRIPTION_KEYWORD);
+            }
+            return new LoadPopularCost(ManageTransactionActivity.this, mDb, keyword);
+        }
+
+        @Override
+        public void onLoadFinished(@NonNull Loader<Float> loader, Float popularCost) {
+            mEditTextCost.setText(String.format(Locale.US, "%.2f", Math.abs(popularCost)));
+        }
+
+        @Override
+        public void onLoaderReset(@NonNull Loader<Float> loader) {
+
+        }
+    };
 
 }

@@ -9,6 +9,7 @@ import android.arch.persistence.room.Update;
 
 import com.example.smoiapp001.models.TransactionEntry;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -28,5 +29,10 @@ public interface TransactionDao {
 
     @Query("SELECT * FROM `transaction` WHERE id = :id")
     TransactionEntry loadTransactionById(int id);
+
+    @Query("SELECT cost FROM `transaction` " +
+            "WHERE description LIKE :keyword GROUP BY cost " +
+            "ORDER BY COUNT(cost) DESC LIMIT 1")
+    Float loadPopularCostByDescription(String keyword);
 
 }

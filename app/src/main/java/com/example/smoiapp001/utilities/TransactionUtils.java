@@ -67,4 +67,14 @@ public class TransactionUtils {
         }
         return monthSum;
     }
+
+    public static float getCostModeByDescription(String description) {
+
+        return 0;
+    }
+
+    public static String[] getDescriptionSearchResult(String description) {
+
+        return null;
+    }
 }
