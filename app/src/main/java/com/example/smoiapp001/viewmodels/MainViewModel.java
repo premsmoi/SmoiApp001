@@ -1,11 +1,11 @@
-package com.example.smoiapp001;
+package com.example.smoiapp001.viewmodels;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.util.Log;
 
-import com.example.smoiapp001.models.TransactionEntry;
+import com.example.smoiapp001.database.models.TransactionEntry;
 import com.example.smoiapp001.database.AppDatabase;
 
 import java.util.List;

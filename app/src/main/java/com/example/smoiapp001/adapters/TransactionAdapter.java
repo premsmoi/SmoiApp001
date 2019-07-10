@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package com.example.smoiapp001;
+package com.example.smoiapp001.adapters;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -24,7 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.smoiapp001.models.TransactionEntry;
+import com.example.smoiapp001.R;
+import com.example.smoiapp001.database.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
 
 import java.util.List;
@@ -41,7 +42,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     // Class variables for the List that holds task data and the Context
     private List<TransactionEntry> mTransactionEntries;
     private Context mContext;
-
 
     /**
      * Constructor for the TaskAdapter that initializes the Context.

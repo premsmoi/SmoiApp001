@@ -1,4 +1,4 @@
-package com.example.smoiapp001.models;
+package com.example.smoiapp001.database.models;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;

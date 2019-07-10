@@ -13,4 +13,12 @@
     <string name="delete_button">Delete</string>
     <string name="monthly_cost_label">By month:</string>
     <string name="show_all_label">Show All</string>
+    <string name="last_7_days_label">Last 7 Days</string>
+    <string name="last_30_days_label">Last 30 Days</string>
+    <string name="all_time_label">All Time</string>
+
+    <string-array name="filter_array">
+        <item>Top Count</item>
+        <item>Top Cost</item>
+    </string-array>
 </resources>

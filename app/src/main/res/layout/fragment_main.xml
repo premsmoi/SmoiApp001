@@ -93,7 +93,7 @@
 
         <!-- RecyclerView that is responsible for holding a list of Transaction Entry data -->
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerViewDailyTransactions"
+            android:id="@+id/recycler_view_transaction"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

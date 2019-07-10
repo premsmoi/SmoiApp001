@@ -1,8 +1,6 @@
 package com.example.smoiapp001.utilities;
 
-import android.util.Log;
-
-import com.example.smoiapp001.models.TransactionEntry;
+import com.example.smoiapp001.database.models.TransactionEntry;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package com.example.smoiapp001.activities.fragments;
+package com.example.smoiapp001.loaders;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -6,15 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.example.smoiapp001.database.AppDatabase;
+import com.example.smoiapp001.database.models.TransactionEntry;
 
-public class LoadPopularCost extends AsyncTaskLoader<Float> {
+public class LoadTransactionById extends AsyncTaskLoader<TransactionEntry> {
     private AppDatabase db;
-    private String keyword;
+    private Integer id;
 
-    public LoadPopularCost(@NonNull Context context, AppDatabase db, String keyword ) {
+    public LoadTransactionById(@NonNull Context context, AppDatabase db, Integer id ) {
         super(context);
         this.db = db;
-        this.keyword = keyword;
+        this.id = id;
     }
 
     @Override
@@ -25,8 +26,8 @@ public class LoadPopularCost extends AsyncTaskLoader<Float> {
 
     @Nullable
     @Override
-    public Float loadInBackground() {
-        return db.transactionDao().loadPopularCostByDescription(keyword);
+    public TransactionEntry loadInBackground() {
+        return db.transactionDao().loadTransactionById(id);
     }
 
 }

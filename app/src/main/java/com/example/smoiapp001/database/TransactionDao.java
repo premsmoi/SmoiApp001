@@ -2,14 +2,12 @@ package com.example.smoiapp001.database;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.example.smoiapp001.models.TransactionEntry;
+import com.example.smoiapp001.database.models.TransactionEntry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -33,6 +31,7 @@ public interface TransactionDao {
     @Query("SELECT cost FROM `transaction` " +
             "WHERE description LIKE :keyword GROUP BY cost " +
             "ORDER BY COUNT(cost) DESC LIMIT 1")
-    Float loadPopularCostByDescription(String keyword);
+    Float loadRecommendedCostByDescription(String keyword);
+
 
 }

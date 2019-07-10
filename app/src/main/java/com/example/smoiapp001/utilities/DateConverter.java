@@ -17,6 +17,10 @@ public class DateConverter {
 
     // Constant for a day in millisecond
     public static final long DAY_IN_MILLISECOND = 86400000;
+    public static final long WEEK_IN_MILLISECOND = 7 * DAY_IN_MILLISECOND;
+    // Assume that one month is 30 days
+    public static final long MONTH_IN_MILLISECOND = 30 * DAY_IN_MILLISECOND;
+
 
     @TypeConverter
     public static Date toDate(Long timestamp) {

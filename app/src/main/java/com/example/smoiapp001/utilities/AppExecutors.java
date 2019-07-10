@@ -1,4 +1,4 @@
-package com.example.smoiapp001;
+package com.example.smoiapp001.utilities;
 
 /*
  * Copyright (C) 2017 The Android Open Source Project
