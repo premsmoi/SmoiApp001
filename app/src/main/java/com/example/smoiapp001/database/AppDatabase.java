@@ -1,21 +1,18 @@
 package com.example.smoiapp001.database;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.db.SupportSQLiteQuery;
-import android.arch.persistence.db.SupportSQLiteQueryBuilder;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
+import androidx.sqlite.db.SupportSQLiteQuery;
+import androidx.sqlite.db.SupportSQLiteQueryBuilder;
+import androidx.room.Database;
+import androidx.room.Query;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
 import com.example.smoiapp001.database.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
-
-import java.util.Date;
 
 @Database(entities = {TransactionEntry.class}, version = 2, exportSchema = false)
 @TypeConverters(DateConverter.class)

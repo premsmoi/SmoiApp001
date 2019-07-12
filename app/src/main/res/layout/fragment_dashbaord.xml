@@ -31,7 +31,7 @@
                 android:textSize="@dimen/Large_text_size"
                 android:text="@string/last_7_days_label"/>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_weekly_transaction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 android:textSize="@dimen/Large_text_size"
                 android:text="@string/last_30_days_label"/>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_monthly_transaction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
                 android:textSize="@dimen/Large_text_size"
                 android:text="@string/all_time_label"/>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_all_time_transaction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

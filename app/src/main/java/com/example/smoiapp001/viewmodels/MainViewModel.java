@@ -1,8 +1,8 @@
 package com.example.smoiapp001.viewmodels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import android.util.Log;
 
 import com.example.smoiapp001.database.models.TransactionEntry;

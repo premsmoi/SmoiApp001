@@ -1,10 +1,8 @@
 package com.example.smoiapp001.utilities;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 

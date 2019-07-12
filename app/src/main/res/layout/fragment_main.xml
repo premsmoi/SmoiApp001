@@ -54,6 +54,15 @@
                     android:textSize="@dimen/normal_text_size"
                     android:text="@string/monthly_cost_label" />
 
+                <TextView
+                    android:id="@+id/tv_day_avg_cost_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/layout_horizontal_margin"
+                    android:layout_marginTop="@dimen/layout_vertical_margin"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="Cost per Day" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -80,6 +89,14 @@
                     android:textSize="@dimen/Large_text_size"
                     android:text="0" />
 
+                <TextView
+                    android:id="@+id/tv_day_avg_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:textSize="@dimen/Large_text_size"
+                    android:text="0" />
+
             </LinearLayout>
 
             <CheckBox
@@ -92,7 +109,7 @@
         </RelativeLayout>
 
         <!-- RecyclerView that is responsible for holding a list of Transaction Entry data -->
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_transaction"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -103,7 +120,7 @@
 
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

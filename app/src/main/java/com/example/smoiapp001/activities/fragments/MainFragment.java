@@ -1,19 +1,19 @@
 package com.example.smoiapp001.activities.fragments;
 
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,14 +31,24 @@ import com.example.smoiapp001.activities.ManageTransactionActivity;
 import com.example.smoiapp001.database.models.TransactionEntry;
 import com.example.smoiapp001.utilities.DateConverter;
 import com.example.smoiapp001.utilities.TransactionUtils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.FirebaseError;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
-import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
+import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 
 public class MainFragment extends Fragment implements TransactionAdapter.ItemClickListener {
 
@@ -46,9 +56,12 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private DatabaseReference firebaseDB;
+
     private View fragmentView;
     private TextView dayCostTextView;
     private TextView monthCostTextView;
+    private TextView dayAverageCostTextView;
     private Button selectDateButton;
     private CheckBox showAllCheckBox;
     private FloatingActionButton fabButton;
@@ -90,6 +103,8 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         descriptionList = new ArrayList<>();
         setupViewModel();
 
+        firebaseDB = FirebaseDatabase.getInstance().getReference();
+
         return fragmentView;
     }
 
@@ -103,6 +118,7 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         mRecyclerView = fragmentView.findViewById(R.id.recycler_view_transaction);
         dayCostTextView = fragmentView.findViewById(R.id.tv_daily_cost);
         monthCostTextView = fragmentView.findViewById(R.id.tv_monthly_cost);
+        dayAverageCostTextView = fragmentView.findViewById(R.id.tv_day_avg_cost);
         showAllCheckBox = fragmentView.findViewById(R.id.checkbox_show_all);
         showAllCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -138,6 +154,8 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
                 Calendar selectedCalendar = getSelectedCalendar();
                 descriptionList = TransactionUtils.getDescriptionList(transactionEntries);
 
+                //syncFirebaseDatabase();
+
                 if (!showAllCheckBox.isChecked()) {
                     selectedEntries = TransactionUtils.getTransactionByDate(transactionEntries, selectedCalendar);
                     mAdapter.setTransactions(selectedEntries);
@@ -146,6 +164,7 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
                 }
                 setDayCostView(TransactionUtils.calculateDayCost(transactionEntries, selectedCalendar));
                 setMonthCostView(TransactionUtils.calculateMonthCost(transactionEntries, selectedCalendar));
+                setDayAverageCostView(TransactionUtils.calculateMonthCost(transactionEntries, selectedCalendar));
             }
 
         });
@@ -175,6 +194,36 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         monthCostTextView.setText(monthCostString);
     }
 
+    private void setDayAverageCostView(Float monthCost) {
+        String monthCostString = "";
+        int today = new Date().getDate();
+        int todayMonth = new Date().getMonth();
+        int selectedDay = DateConverter.getDayByNormalFormat(selectDateButton.getText().toString());
+        int selectedMonth = DateConverter.getMonthByNormalFormat(selectDateButton.getText().toString());
+        int selectedYear = DateConverter.getYearByNormalFormat(selectDateButton.getText().toString());
+        /*Log.i(TAG, "todayMonth: "+todayMonth);
+        Log.i(TAG, "selectedMonth: "+selectedMonth);*/
+        Log.i(TAG, "today: "+today);
+        Log.i(TAG, "selectedDay: "+selectedDay);
+
+        if (todayMonth == selectedMonth) {
+            monthCostString = String.format(Locale.US,"%.2f", monthCost/today);
+        }
+        else if (todayMonth > selectedMonth) {
+            Calendar calendar = new GregorianCalendar(selectedYear, selectedMonth ,selectedDay);
+            int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            monthCostString = String.format(Locale.US,"%.2f", monthCost/daysInMonth);
+        }
+
+        if (monthCost < 0) {
+            dayAverageCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorRed));
+        } else {
+            dayAverageCostTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.colorGreen));
+            monthCostString = "+" + monthCostString;
+        }
+        dayAverageCostTextView.setText(monthCostString);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
@@ -191,6 +240,9 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
             setMonthCostView(TransactionUtils.calculateMonthCost(
                    viewModel.getTransactions().getValue(),
                    selectedCalendar));
+            setDayAverageCostView(TransactionUtils.calculateMonthCost(
+                    viewModel.getTransactions().getValue(),
+                    selectedCalendar));
             setupViewModel();
 
             /*Log.i("selectedDate", selectedDateString);
@@ -232,5 +284,39 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         intent.putExtra(ManageTransactionActivity.EXTRA_DESCRIPTION_LIST, descriptionList);
         Log.i("Intent", "Go to ManageTransactionActivity");
         startActivity(intent);
+    }
+
+    private void syncFirebaseDatabase() {
+        List<TransactionEntry> transactionEntries =  viewModel.getTransactions().getValue();
+        for (TransactionEntry transaction : transactionEntries) {
+            final Map<String, Object> transactionObj = transaction.toMap();
+            final DatabaseReference transactionsRef = firebaseDB.child("transactions");
+
+            transactionsRef.orderByChild("id").equalTo(transaction.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Log.i(TAG, "exists!!! No need to add");
+                        } else {
+                            transactionsRef.push().setValue(transactionObj);
+                            Log.i(TAG, "not exist, let's add new one");
+                        }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            //transactionsRef.push().setValue(transactionObj);
+            /*break;*/
+            /*if (transactionsRef.)
+            String id = Integer.toString(transaction.getId());
+            transactionsRef.child(id).child("description").setValue(transaction.getDescription());
+            transactionsRef.child(id).child("cost").setValue(transaction.getCost());
+            transactionsRef.child(id).child("date").setValue(DateConverter.toTimestamp(transaction.getDate()));
+            break;*/
+        }
     }
 }

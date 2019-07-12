@@ -2,11 +2,11 @@ package com.example.smoiapp001.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +46,12 @@ public class RankingTransactionAdapter extends RecyclerView.Adapter<RankingTrans
         items.moveToPosition(position);
         /*Log.i("column count", ""+items.getColumnCount());
         Log.i("row count", ""+items.getCount());*/
-        String name = items.getString(AppDatabase.RANK_NAME_COL_IDX);
-
-        Integer value = items.getInt(AppDatabase.RANK_VALUE_COL_IDX);
+        String name = "";
+        Integer value = 0;
+        //if (items.getColumnCount() > 2) {
+            name = items.getString(AppDatabase.RANK_NAME_COL_IDX);
+            value = items.getInt(AppDatabase.RANK_VALUE_COL_IDX);
+        //}
 
         if (value < 0) {
             value = Math.abs(value);

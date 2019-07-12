@@ -19,11 +19,11 @@ package com.example.smoiapp001.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -299,7 +299,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
     private void loadTransactionById(Intent intent) {
         if (mTransactionId == DEFAULT_TRANSACTION_ID) {
             mTransactionId = intent.getIntExtra(EXTRA_TRANSACTION_ID, DEFAULT_TRANSACTION_ID);
-            android.support.v4.app.LoaderManager.getInstance(this).initLoader(TRANSACTION_LOADER_ID,
+            LoaderManager.getInstance(this).initLoader(TRANSACTION_LOADER_ID,
                     null, transactionLoaderListener);
         }
     }
@@ -310,7 +310,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
         Log.i("keyword", keyword);
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_DESCRIPTION_KEYWORD, keyword);
-        android.support.v4.app.LoaderManager.getInstance(this).restartLoader(POPULAR_COST_LOADER_ID,
+        LoaderManager.getInstance(this).restartLoader(POPULAR_COST_LOADER_ID,
                 bundle, popularCostLoaderListener);
     }
 

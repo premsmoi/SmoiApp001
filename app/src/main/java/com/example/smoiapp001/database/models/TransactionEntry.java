@@ -1,9 +1,13 @@
 package com.example.smoiapp001.database.models;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import com.example.smoiapp001.utilities.DateConverter;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity(tableName = "transaction")
 public class TransactionEntry {
@@ -18,6 +22,16 @@ public class TransactionEntry {
         this.description = description;
         this.cost        = cost;
         this.date        = date;
+    }
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("description", description);
+        result.put("cost", cost);
+        result.put("date", DateConverter.toTimestamp(date));
+
+        return result;
     }
 
     public int getId() {
