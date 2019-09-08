@@ -14,7 +14,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         Log.i("Test", "Received!");
         String action = "com.example.smoiapp001.NOTIFICATION_ACTION";
         if (intent.getAction().equals(action)) {
-            NotificationUtils.remindUserToAddItem(context);
+            NotificationUtils.INSTANCE.remindUserToAddItem(context);
         }
 
     }

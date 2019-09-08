@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="@dimen/layout_horizontal_margin"
     android:paddingVertical="@dimen/layout_vertical_margin"
-    android:background="#e6e6e6">
+    android:background="#ffffff">
 
     <Spinner
         android:id="@+id/filter_spinner"

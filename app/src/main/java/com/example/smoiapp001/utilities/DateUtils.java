@@ -3,6 +3,7 @@ package com.example.smoiapp001.utilities;
 import androidx.room.TypeConverter;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -85,6 +86,11 @@ public class DateUtils {
         String formedDate = dayString + "/" + monthString + "/" + year;
 
         return formedDate;
+    }
+
+    public static long getCurrentTimeStamp() {
+        return new Date().getTime();
+
     }
 
 }
