@@ -16,6 +16,11 @@
     <string name="last_7_days_label">Last 7 Days</string>
     <string name="last_30_days_label">Last 30 Days</string>
     <string name="all_time_label">All Time</string>
+    <string name="syncronize_firebase_string">Syncronize Firebase</string>
+
+    <string name="add_item_reminder_notification_title">Let\'s add your item!</string>
+    <string name="add_item_reminder_notification_body">Touch to add item now</string>
+    <string name="main_notification_channel_name">Primary</string>
 
     <string-array name="filter_array">
         <item>Top Count</item>

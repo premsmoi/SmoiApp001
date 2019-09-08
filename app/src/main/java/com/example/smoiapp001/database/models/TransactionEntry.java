@@ -3,7 +3,7 @@ package com.example.smoiapp001.database.models;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.DateUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class TransactionEntry {
         result.put("id", id);
         result.put("description", description);
         result.put("cost", cost);
-        result.put("date", DateConverter.toTimestamp(date));
+        result.put("date", DateUtils.toTimestamp(date));
 
         return result;
     }

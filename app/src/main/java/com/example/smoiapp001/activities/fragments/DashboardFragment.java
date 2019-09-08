@@ -21,7 +21,7 @@ import com.example.smoiapp001.activities.MainActivity;
 import com.example.smoiapp001.adapters.RankingTransactionAdapter;
 import com.example.smoiapp001.database.AppDatabase;
 import com.example.smoiapp001.database.models.TransactionEntry;
-import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.DateUtils;
 import com.example.smoiapp001.viewmodels.MainViewModel;
 
 import java.util.Date;
@@ -134,9 +134,9 @@ public class DashboardFragment extends Fragment {
     }
 
     private void loadAllMostCostItems() {
-        long todayTimestamp = DateConverter.toTimestamp(new Date());
-        long last7daysTimestamp = todayTimestamp - DateConverter.WEEK_IN_MILLISECOND;
-        long last30daysTimestamp = todayTimestamp - DateConverter.MONTH_IN_MILLISECOND;
+        long todayTimestamp = DateUtils.toTimestamp(new Date());
+        long last7daysTimestamp = todayTimestamp - DateUtils.WEEK_IN_MILLISECOND;
+        long last30daysTimestamp = todayTimestamp - DateUtils.MONTH_IN_MILLISECOND;
 
         loadMostCostItems(0, mAllTimeAdapter);
         loadMostCostItems(last7daysTimestamp, mWeeklyAdapter);
@@ -145,9 +145,9 @@ public class DashboardFragment extends Fragment {
     }
 
     private void loadAllMostRecordedItems() {
-        long todayTimestamp = DateConverter.toTimestamp(new Date());
-        long last7daysTimestamp = todayTimestamp - DateConverter.WEEK_IN_MILLISECOND;
-        long last30daysTimestamp = todayTimestamp - DateConverter.MONTH_IN_MILLISECOND;
+        long todayTimestamp = DateUtils.toTimestamp(new Date());
+        long last7daysTimestamp = todayTimestamp - DateUtils.WEEK_IN_MILLISECOND;
+        long last30daysTimestamp = todayTimestamp - DateUtils.MONTH_IN_MILLISECOND;
 
         loadMostRecordedItems(0, mAllTimeAdapter);
         loadMostRecordedItems(last7daysTimestamp, mWeeklyAdapter);

@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.database.models.TransactionEntry;
-import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.DateUtils;
 
 import java.util.List;
 import java.util.Locale;
@@ -83,7 +83,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         float cost = transactionEntry.getCost();
         String costString = String.format(Locale.US,"%.2f", cost);
         int costTextColor;
-        String updatedAt = DateConverter.getNormalDateFormat().format(transactionEntry.getDate());
+        String updatedAt = DateUtils.getNormalDateFormat().format(transactionEntry.getDate());
 
         //Set values
         holder.descriptionView.setText(description);

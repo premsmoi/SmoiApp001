@@ -4,9 +4,13 @@ import com.example.smoiapp001.database.models.TransactionEntry;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class TransactionUtils {
+
+    // Constant for editing transaction period, 1 day
+    private static final long EDITABLE_TRANSACTION_PERIOD = DateUtils.DAY_IN_MILLISECOND;
 
     public static ArrayList<String> getDescriptionList(List<TransactionEntry> transactions) {
         ArrayList<String> descriptions = new ArrayList<>();
@@ -74,5 +78,14 @@ public class TransactionUtils {
     public static String[] getDescriptionSearchResult(String description) {
 
         return null;
+    }
+
+    public static boolean isLocked(TransactionEntry transaction) {
+        long nowTimestamp = DateUtils.toTimestamp(new Date());
+        long transactionTimestamp = DateUtils.toTimestamp(transaction.getDate());
+        if (nowTimestamp - transactionTimestamp >= EDITABLE_TRANSACTION_PERIOD) {
+            return true;
+        }
+        return false;
     }
 }

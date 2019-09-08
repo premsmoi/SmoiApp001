@@ -44,7 +44,8 @@ import com.example.smoiapp001.loaders.LoadTransactionById;
 import com.example.smoiapp001.database.models.TransactionEntry;
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.database.AppDatabase;
-import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.DateUtils;
+import com.example.smoiapp001.utilities.TransactionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,9 +58,6 @@ public class ManageTransactionActivity extends AppCompatActivity {
     private static final String EXPENSE_TRANSACTION_TYPE = "expense";
     private static final String INCOME_TRANSACTION_TYPE = "income";
 
-    // Constant for mTransaction timeout, 1 day
-    private static final long TRANSACTION_TIMEOUT_PERIOD = DateConverter.DAY_IN_MILLISECOND;
-
     private static final int TRANSACTION_LOADER_ID = 21;
     private static final int POPULAR_COST_LOADER_ID = 22;
 
@@ -70,6 +68,8 @@ public class ManageTransactionActivity extends AppCompatActivity {
     // Extra for the mTransaction ID to be received after rotation
     public static final String INSTANCE_TRANSACTION_ID = "instanceTransactionId";
     public static final String EXTRA_DESCRIPTION_KEYWORD = "description-keyword";
+
+    public static final String ACTION_MANAGE_TRANSACTION = "manage-transaction";
 
     // Constant for default task id to be used when not in update mode
     private static final int DEFAULT_TRANSACTION_ID = -1;
@@ -96,7 +96,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_transaction);
-        Log.i(TAG, "In ManageTransactionActivity");
+        //Log.i(TAG, "In ManageTransactionActivity");
         initViews();
 
         mDb = AppDatabase.getInstance(getApplicationContext());
@@ -106,6 +106,8 @@ public class ManageTransactionActivity extends AppCompatActivity {
             if (intent.hasExtra(EXTRA_TRANSACTION_ID)) {
                 mLinearLayout.setVisibility(View.INVISIBLE);
                 this.setTitle(R.string.update_transaction_activity_name);
+                mDeleteButton.setVisibility(View.VISIBLE);
+                mActionButton.setEnabled(true);
                 mActionButton.setText(R.string.update_button);
                 loadTransactionById(intent);
             }
@@ -139,6 +141,29 @@ public class ManageTransactionActivity extends AppCompatActivity {
         mRadioGroupType = findViewById(R.id.radioGroup);
         mActionButton = findViewById(R.id.saveButton);
         mDeleteButton = findViewById(R.id.deleteButton);
+        mActionButton.setEnabled(false);
+        mDeleteButton.setVisibility(View.INVISIBLE);
+
+        mEditTextCost.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isDrafted()) {
+                    mActionButton.setEnabled(true);
+                } else {
+                    mActionButton.setEnabled(false);
+                }
+            }
+        });
 
         mEditTextDescription.addTextChangedListener(new TextWatcher() {
             @Override
@@ -153,6 +178,11 @@ public class ManageTransactionActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (isDrafted()) {
+                    mActionButton.setEnabled(true);
+                } else {
+                    mActionButton.setEnabled(false);
+                }
                 mEditTextCost.setText(null);
             }
         });
@@ -160,7 +190,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
         mEditTextDescription.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i(TAG, "Selected!");
+                //Log.i(TAG, "Selected!");
                 loadRecommendedCost();
             }
         });
@@ -180,6 +210,16 @@ public class ManageTransactionActivity extends AppCompatActivity {
         });
     }
 
+    private boolean isDrafted() {
+        if (!(mEditTextDescription.getText().toString().equals(""))
+            && !(mEditTextCost.getText().toString().equals(""))) {
+            System.out.println("drafted");
+            return true;
+        }
+        System.out.println("not drafted");
+        return false;
+    }
+
     private void lockTransaction() {
         String costString = mEditTextCost.getText().toString();
         costString += " THB";
@@ -194,7 +234,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
         int checkedIndex = mRadioGroupType.indexOfChild(
                 mRadioGroupType.findViewById(
                 mRadioGroupType.getCheckedRadioButtonId()));
-        Log.i(TAG, "checkedIndex: "+checkedIndex);
+        //Log.i(TAG, "checkedIndex: "+checkedIndex);
         for (int i = 0; i < mRadioGroupType.getChildCount(); i++) {
             if (i != checkedIndex) {
                 mRadioGroupType.getChildAt(i).setEnabled(false);
@@ -213,7 +253,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
         }
         mEditTextDescription.setText(transaction.getDescription());
         mEditTextCost.setText(String.format(Locale.US,"%.2f", Math.abs(transaction.getCost())));
-        mTextViewDate.setText(DateConverter.getObviousDateFormat().format(transaction.getDate()));
+        mTextViewDate.setText(DateUtils.getObviousDateFormat().format(transaction.getDate()));
 
         String type = EXPENSE_TRANSACTION_TYPE;
         if (transaction.getCost() >= 0) {
@@ -307,7 +347,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
     private void loadRecommendedCost() {
         String keyword = mEditTextDescription.getText().toString();
         keyword = "%" + keyword + "%";
-        Log.i("keyword", keyword);
+        //Log.i("keyword", keyword);
         Bundle bundle = new Bundle();
         bundle.putString(EXTRA_DESCRIPTION_KEYWORD, keyword);
         LoaderManager.getInstance(this).restartLoader(POPULAR_COST_LOADER_ID,
@@ -326,8 +366,7 @@ public class ManageTransactionActivity extends AppCompatActivity {
         public void onLoadFinished(@NonNull Loader<TransactionEntry> loader, TransactionEntry transactionEntry) {
             mTransaction = transactionEntry;
             populateUI(mTransaction);
-            if (DateConverter.toTimestamp(new Date())- DateConverter.toTimestamp(transactionEntry.getDate())
-                    >= TRANSACTION_TIMEOUT_PERIOD) {
+            if (TransactionUtils.isLocked(mTransaction)) {
                 lockTransaction();
             }
             mLinearLayout.setVisibility(View.VISIBLE);

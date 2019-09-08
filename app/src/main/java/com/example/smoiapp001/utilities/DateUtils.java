@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateConverter {
+public class DateUtils {
 
     // Constant for normal date format
     public static final String DATE_FORMAT_NORMAL = "dd/MM/yyyy";
@@ -62,12 +62,12 @@ public class DateConverter {
 
     public static SimpleDateFormat getNormalDateFormat(){
 
-        return new SimpleDateFormat(DateConverter.DATE_FORMAT_NORMAL, Locale.getDefault());
+        return new SimpleDateFormat(DateUtils.DATE_FORMAT_NORMAL, Locale.getDefault());
     }
 
     public static SimpleDateFormat getObviousDateFormat(){
 
-        return new SimpleDateFormat(DateConverter.DATE_FORMAT_OBVIOUS, Locale.getDefault());
+        return new SimpleDateFormat(DateUtils.DATE_FORMAT_OBVIOUS, Locale.getDefault());
     }
 
     public static String buildNormalDateString(int year, int month, int day) {

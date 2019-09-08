@@ -20,6 +20,13 @@
         <activity
             android:name=".activities.ManageTransactionActivity"
             android:label="@string/add_transaction_activity_name" />
+
+        <receiver android:name=".AlarmNotificationReceiver" android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.example.smoiapp001.NOTIFICATION_ACTION" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

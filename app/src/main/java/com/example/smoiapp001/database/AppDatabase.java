@@ -1,9 +1,6 @@
 package com.example.smoiapp001.database;
 
-import androidx.sqlite.db.SupportSQLiteQuery;
-import androidx.sqlite.db.SupportSQLiteQueryBuilder;
 import androidx.room.Database;
-import androidx.room.Query;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
@@ -12,10 +9,10 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.example.smoiapp001.database.models.TransactionEntry;
-import com.example.smoiapp001.utilities.DateConverter;
+import com.example.smoiapp001.utilities.DateUtils;
 
 @Database(entities = {TransactionEntry.class}, version = 2, exportSchema = false)
-@TypeConverters(DateConverter.class)
+@TypeConverters(DateUtils.class)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = AppDatabase.class.getSimpleName();
@@ -40,7 +37,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         Log.d(LOG_TAG, "Getting the database instance");
         String currentDBPath = sInstance.getOpenHelper().getWritableDatabase().getPath();
-        Log.i("DB PATH",currentDBPath);
+        //Log.i("DB PATH",currentDBPath);
         return sInstance;
     }
 

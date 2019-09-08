@@ -2,7 +2,7 @@ package com.example.smoiapp001.activities.fragments;
 
 import android.app.Activity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -23,16 +23,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.example.smoiapp001.utilities.DateUtils;
 import com.example.smoiapp001.viewmodels.MainViewModel;
 import com.example.smoiapp001.R;
 import com.example.smoiapp001.adapters.TransactionAdapter;
 import com.example.smoiapp001.activities.MainActivity;
 import com.example.smoiapp001.activities.ManageTransactionActivity;
 import com.example.smoiapp001.database.models.TransactionEntry;
-import com.example.smoiapp001.utilities.DateConverter;
 import com.example.smoiapp001.utilities.TransactionUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -46,7 +45,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import static androidx.recyclerview.widget.DividerItemDecoration.VERTICAL;
 
@@ -55,8 +53,6 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
     public static final String NAME = "Main";
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private DatabaseReference firebaseDB;
 
     private View fragmentView;
     private TextView dayCostTextView;
@@ -103,8 +99,6 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         descriptionList = new ArrayList<>();
         setupViewModel();
 
-        firebaseDB = FirebaseDatabase.getInstance().getReference();
-
         return fragmentView;
     }
 
@@ -127,7 +121,7 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
             }
         });
         selectDateButton = fragmentView.findViewById(R.id.bt_selected_date);
-        selectDateButton.setText(DateConverter.getNormalDateFormat().format(new Date()));
+        selectDateButton.setText(DateUtils.getNormalDateFormat().format(new Date()));
         selectDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,8 +147,6 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
                 ArrayList<TransactionEntry> selectedEntries;
                 Calendar selectedCalendar = getSelectedCalendar();
                 descriptionList = TransactionUtils.getDescriptionList(transactionEntries);
-
-                //syncFirebaseDatabase();
 
                 if (!showAllCheckBox.isChecked()) {
                     selectedEntries = TransactionUtils.getTransactionByDate(transactionEntries, selectedCalendar);
@@ -198,13 +190,13 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         String monthCostString = "";
         int today = new Date().getDate();
         int todayMonth = new Date().getMonth();
-        int selectedDay = DateConverter.getDayByNormalFormat(selectDateButton.getText().toString());
-        int selectedMonth = DateConverter.getMonthByNormalFormat(selectDateButton.getText().toString());
-        int selectedYear = DateConverter.getYearByNormalFormat(selectDateButton.getText().toString());
+        int selectedDay = DateUtils.getDayByNormalFormat(selectDateButton.getText().toString());
+        int selectedMonth = DateUtils.getMonthByNormalFormat(selectDateButton.getText().toString());
+        int selectedYear = DateUtils.getYearByNormalFormat(selectDateButton.getText().toString());
         /*Log.i(TAG, "todayMonth: "+todayMonth);
-        Log.i(TAG, "selectedMonth: "+selectedMonth);*/
+        Log.i(TAG, "selectedMonth: "+selectedMonth);
         Log.i(TAG, "today: "+today);
-        Log.i(TAG, "selectedDay: "+selectedDay);
+        Log.i(TAG, "selectedDay: "+selectedDay);*/
 
         if (todayMonth == selectedMonth) {
             monthCostString = String.format(Locale.US,"%.2f", monthCost/today);
@@ -229,7 +221,7 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             int[] result;
             result = data.getIntArrayExtra("selectedDate");
-            String selectedDateString = DateConverter.
+            String selectedDateString = DateUtils.
                     buildNormalDateString(result[0], result[1], result[2]);
 
             selectDateButton.setText(selectedDateString);
@@ -258,9 +250,9 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
     public Calendar getSelectedCalendar() {
         String selectedDateString = selectDateButton.getText().toString();
         selectedCalendar = Calendar.getInstance();
-        selectedCalendar.set(DateConverter.getYearByNormalFormat(selectedDateString),
-                DateConverter.getMonthByNormalFormat(selectedDateString),
-                DateConverter.getDayByNormalFormat(selectedDateString));
+        selectedCalendar.set(DateUtils.getYearByNormalFormat(selectedDateString),
+                DateUtils.getMonthByNormalFormat(selectedDateString),
+                DateUtils.getDayByNormalFormat(selectedDateString));
         return selectedCalendar;
     }
 
@@ -268,9 +260,9 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         DialogFragment newFragment = new DatePickerFragment();
         String date = selectDateButton.getText().toString();
         Bundle dateBundle = new Bundle();
-        dateBundle.putInt("day", DateConverter.getDayByNormalFormat(date));
-        dateBundle.putInt("month", DateConverter.getMonthByNormalFormat(date));
-        dateBundle.putInt("year", DateConverter.getYearByNormalFormat(date));
+        dateBundle.putInt("day", DateUtils.getDayByNormalFormat(date));
+        dateBundle.putInt("month", DateUtils.getMonthByNormalFormat(date));
+        dateBundle.putInt("year", DateUtils.getYearByNormalFormat(date));
         newFragment.setArguments(dateBundle);
         newFragment.setTargetFragment(MainFragment.this, REQUEST_CODE);
         newFragment.show(getFragmentManager(), "datePicker");
@@ -286,37 +278,4 @@ public class MainFragment extends Fragment implements TransactionAdapter.ItemCli
         startActivity(intent);
     }
 
-    private void syncFirebaseDatabase() {
-        List<TransactionEntry> transactionEntries =  viewModel.getTransactions().getValue();
-        for (TransactionEntry transaction : transactionEntries) {
-            final Map<String, Object> transactionObj = transaction.toMap();
-            final DatabaseReference transactionsRef = firebaseDB.child("transactions");
-
-            transactionsRef.orderByChild("id").equalTo(transaction.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()) {
-                            Log.i(TAG, "exists!!! No need to add");
-                        } else {
-                            transactionsRef.push().setValue(transactionObj);
-                            Log.i(TAG, "not exist, let's add new one");
-                        }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-
-            //transactionsRef.push().setValue(transactionObj);
-            /*break;*/
-            /*if (transactionsRef.)
-            String id = Integer.toString(transaction.getId());
-            transactionsRef.child(id).child("description").setValue(transaction.getDescription());
-            transactionsRef.child(id).child("cost").setValue(transaction.getCost());
-            transactionsRef.child(id).child("date").setValue(DateConverter.toTimestamp(transaction.getDate()));
-            break;*/
-        }
-    }
 }
