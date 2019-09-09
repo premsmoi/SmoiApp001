@@ -6,9 +6,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import android.content.Context
 import android.database.Cursor
-import android.util.Log
-
 import com.example.smoiapp001.database.models.TransactionEntry
+
 import com.example.smoiapp001.utilities.DateUtils
 import timber.log.Timber
 
@@ -41,7 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
             Timber.i("Getting the database instance")
-            val currentDBPath = sInstance!!.openHelper.writableDatabase.path
+            //val currentDBPath = sInstance!!.openHelper.writableDatabase.path
             return sInstance!!
         }
 

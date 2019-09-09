@@ -1,13 +1,11 @@
 package com.example.smoiapp001.activities.fragments
 
 import androidx.lifecycle.Observer
-import android.database.Cursor
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +17,6 @@ import com.example.smoiapp001.R
 import com.example.smoiapp001.activities.MainActivity
 import com.example.smoiapp001.adapters.RankingTransactionAdapter
 import com.example.smoiapp001.database.AppDatabase
-import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.utilities.DateUtils
 import com.example.smoiapp001.viewmodels.MainViewModel
 

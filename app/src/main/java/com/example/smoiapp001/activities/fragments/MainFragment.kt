@@ -24,7 +24,6 @@ import com.example.smoiapp001.viewmodels.MainViewModel
 import com.example.smoiapp001.R
 import com.example.smoiapp001.adapters.TransactionAdapter
 import com.example.smoiapp001.activities.MainActivity
-import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.utilities.TransactionUtils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -36,6 +35,7 @@ import java.util.Locale
 
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
+import com.example.smoiapp001.database.models.TransactionEntry
 
 class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
 

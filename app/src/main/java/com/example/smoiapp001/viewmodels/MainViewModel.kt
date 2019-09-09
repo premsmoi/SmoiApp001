@@ -3,10 +3,9 @@ package com.example.smoiapp001.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import android.util.Log
 
-import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.database.AppDatabase
+import com.example.smoiapp001.database.models.TransactionEntry
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 

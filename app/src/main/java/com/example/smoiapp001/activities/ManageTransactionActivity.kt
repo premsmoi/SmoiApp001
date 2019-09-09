@@ -38,9 +38,9 @@ import android.widget.TextView
 import com.example.smoiapp001.utilities.AppExecutors
 import com.example.smoiapp001.loaders.LoadPopularCost
 import com.example.smoiapp001.loaders.LoadTransactionById
-import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.R
 import com.example.smoiapp001.database.AppDatabase
+import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.utilities.DateUtils
 import com.example.smoiapp001.utilities.TransactionUtils
 import timber.log.Timber

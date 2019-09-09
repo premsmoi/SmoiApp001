@@ -5,12 +5,15 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_wallet"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_wallet_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity
+            android:name=".activities.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,6 +23,8 @@
 
         <activity
             android:name=".activities.ManageTransactionActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:label="@string/add_transaction_activity_name" />
 
         <receiver android:name=".AlarmNotificationReceiver" android:enabled="true" >
