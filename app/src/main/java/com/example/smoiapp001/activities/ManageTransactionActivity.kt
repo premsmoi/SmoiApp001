@@ -23,16 +23,9 @@ import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RadioGroup
-import android.widget.TextView
 
 
 import com.example.smoiapp001.utilities.AppExecutors
@@ -43,6 +36,7 @@ import com.example.smoiapp001.database.AppDatabase
 import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.utilities.DateUtils
 import com.example.smoiapp001.utilities.TransactionUtils
+import kotlinx.android.synthetic.main.activity_manage_transaction.*
 import timber.log.Timber
 
 import java.util.ArrayList
@@ -52,14 +46,7 @@ import kotlin.math.absoluteValue
 
 
 class ManageTransactionActivity : AppCompatActivity() {
-    // Fields for views
-    private lateinit var mLinearLayout: LinearLayout
-    private lateinit var mEditTextDescription: AutoCompleteTextView
-    private lateinit var mEditTextCost: EditText
-    private lateinit var mRadioGroupType: RadioGroup
-    private lateinit var mTextViewDate: TextView
-    private lateinit var mActionButton: Button
-    private lateinit var mDeleteButton: Button
+
     private var mTransaction: TransactionEntry? = null
 
     // Member variable for the Database
@@ -71,21 +58,18 @@ class ManageTransactionActivity : AppCompatActivity() {
 
     private val isDrafted: Boolean
         get() {
-            if (mEditTextDescription.text.toString() != "" && mEditTextCost.text.toString() != "") {
-                println("drafted")
+            if (descriptionInput.text.toString() != "" && costInput.text.toString() != "") {
                 return true
             }
-            println("not drafted")
             return false
         }
 
     private val transactionTypeFromViews: String
-        get() = when (mRadioGroupType.checkedRadioButtonId) {
-                R.id.radButton1 -> EXPENSE_TRANSACTION_TYPE
-                R.id.radButton2 -> INCOME_TRANSACTION_TYPE
+        get() = when (radioGroup.checkedRadioButtonId) {
+                R.id.radButtonExpense -> EXPENSE_TRANSACTION_TYPE
+                R.id.radButtonIncome -> INCOME_TRANSACTION_TYPE
                 else -> EXPENSE_TRANSACTION_TYPE
             }
-
 
     private val transactionLoaderListener = object : LoaderManager.LoaderCallbacks<TransactionEntry> {
         override fun onCreateLoader(id: Int, bundle: Bundle?): Loader<TransactionEntry> {
@@ -98,7 +82,7 @@ class ManageTransactionActivity : AppCompatActivity() {
             if (TransactionUtils.isLocked(mTransaction!!)) {
                 lockTransaction()
             }
-            mLinearLayout.visibility = View.VISIBLE
+            manageTransactionLayout.visibility = View.VISIBLE
         }
 
         override fun onLoaderReset(loader: Loader<TransactionEntry>) {
@@ -116,7 +100,7 @@ class ManageTransactionActivity : AppCompatActivity() {
         }
 
         override fun onLoadFinished(loader: Loader<Float>, popularCost: Float) {
-            mEditTextCost.setText(String.format(Locale.US, "%.2f", popularCost.absoluteValue))
+            costInput.setText(String.format(Locale.US, "%.2f", popularCost.absoluteValue))
         }
 
         override fun onLoaderReset(loader: Loader<Float>) {
@@ -135,23 +119,19 @@ class ManageTransactionActivity : AppCompatActivity() {
         val itemId = ManageTransactionActivityArgs.fromBundle(intent.extras!!).itemId
         Timber.i("itemId after navigate is %d",itemId)
         if (intent != null) {
-            /*if (intent.hasExtra(EXTRA_TRANSACTION_ID)) {*/
             if (itemId != -1) {
-                mLinearLayout.visibility = View.INVISIBLE
+                manageTransactionLayout.visibility = View.INVISIBLE
                 this.setTitle(R.string.update_transaction_activity_name)
-                mDeleteButton.visibility = View.VISIBLE
-                mActionButton.isEnabled = true
-                mActionButton.setText(R.string.update_button)
+                deleteButton.visibility = View.VISIBLE
+                saveButton.isEnabled = true
+                saveButton.setText(R.string.update_button)
                 loadTransactionById(itemId)
             }
         }
 
         val arrayAdapter = ArrayAdapter(this,
                 android.R.layout.simple_dropdown_item_1line, descriptionList)
-        mEditTextDescription.setAdapter(arrayAdapter)
-
-        /*Log.i("List", descriptionList.toString());*/
-
+        descriptionInput.setAdapter(arrayAdapter)
     }
 
     private fun getDescriptions() {
@@ -172,17 +152,10 @@ class ManageTransactionActivity : AppCompatActivity() {
      * initViews is called from onCreate to init the member variable views
      */
     private fun initViews() {
-        mLinearLayout = findViewById(R.id.manage_transaction_layout)
-        mEditTextDescription = findViewById(R.id.actv_transaction_description)
-        mEditTextCost = findViewById(R.id.et_transaction_cost)
-        mTextViewDate = findViewById(R.id.tv_transaction_date)
-        mRadioGroupType = findViewById(R.id.radioGroup)
-        mActionButton = findViewById(R.id.saveButton)
-        mDeleteButton = findViewById(R.id.deleteButton)
-        mActionButton.isEnabled = false
-        mDeleteButton.visibility = View.INVISIBLE
+        saveButton.isEnabled = false
+        deleteButton.visibility = View.INVISIBLE
 
-        mEditTextCost.addTextChangedListener(object : TextWatcher {
+        costInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 
             }
@@ -192,11 +165,11 @@ class ManageTransactionActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable) {
-                mActionButton.isEnabled = isDrafted
+                saveButton.isEnabled = isDrafted
             }
         })
 
-        mEditTextDescription.addTextChangedListener(object : TextWatcher {
+        descriptionInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 
             }
@@ -206,38 +179,38 @@ class ManageTransactionActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(s: Editable) {
-                mActionButton.isEnabled = isDrafted
-                mEditTextCost.text = null
+                saveButton.isEnabled = isDrafted
+                costInput.text = null
             }
         })
 
-        mEditTextDescription.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        descriptionInput.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             loadRecommendedCost()
         }
 
-        mActionButton.setOnClickListener { onSaveButtonClicked() }
+        saveButton.setOnClickListener { onSaveButtonClicked() }
 
-        mDeleteButton.setOnClickListener { onDeleteButtonClicked() }
+        deleteButton.setOnClickListener { onDeleteButtonClicked() }
     }
 
     private fun lockTransaction() {
-        var costString = mEditTextCost.text.toString()
+        var costString = costInput.text.toString()
         costString += " THB"
-        mEditTextCost.setText(costString)
-        mEditTextDescription.isFocusable = false
-        mEditTextDescription.setBackgroundColor(Color.TRANSPARENT)
-        mEditTextCost.isFocusable = false
-        mEditTextCost.setBackgroundColor(Color.TRANSPARENT)
-        mActionButton.visibility = View.INVISIBLE
-        mDeleteButton.visibility = View.INVISIBLE
+        costInput.setText(costString)
+        descriptionInput.isFocusable = false
+        descriptionInput.setBackgroundColor(Color.TRANSPARENT)
+        costInput.isFocusable = false
+        costInput.setBackgroundColor(Color.TRANSPARENT)
+        saveButton.visibility = View.INVISIBLE
+        deleteButton.visibility = View.INVISIBLE
 
-        val checkedIndex = mRadioGroupType.indexOfChild(
-                mRadioGroupType.findViewById(
-                        mRadioGroupType.checkedRadioButtonId))
+        val checkedIndex = radioGroup.indexOfChild(
+                radioGroup.findViewById(
+                        radioGroup.checkedRadioButtonId))
         //Log.i(TAG, "checkedIndex: "+checkedIndex);
-        for (i in 0 until mRadioGroupType.childCount) {
+        for (i in 0 until radioGroup.childCount) {
             if (i != checkedIndex) {
-                mRadioGroupType.getChildAt(i).isEnabled = false
+                radioGroup.getChildAt(i).isEnabled = false
             }
         }
     }
@@ -251,9 +224,9 @@ class ManageTransactionActivity : AppCompatActivity() {
         if (transaction == null) {
             return
         }
-        mEditTextDescription.setText(transaction.description)
-        mEditTextCost.setText(String.format(Locale.US, "%.2f", transaction.cost.absoluteValue))
-        mTextViewDate.text = DateUtils.getObviousDateFormat().format(transaction.date)
+        descriptionInput.setText(transaction.description)
+        costInput.setText(String.format(Locale.US, "%.2f", transaction.cost.absoluteValue))
+        date.text = DateUtils.getObviousDateFormat().format(transaction.date)
 
         var type = EXPENSE_TRANSACTION_TYPE
         if (transaction.cost >= 0) {
@@ -267,8 +240,8 @@ class ManageTransactionActivity : AppCompatActivity() {
      * It retrieves user input and inserts that new task data into the underlying database.
      */
     private fun onSaveButtonClicked() {
-        val description = mEditTextDescription.text.toString()
-        var cost = java.lang.Float.parseFloat(mEditTextCost.text.toString())
+        val description = descriptionInput.text.toString()
+        var cost = java.lang.Float.parseFloat(costInput.text.toString())
         val date = Date()
         val type = transactionTypeFromViews
 
@@ -294,7 +267,6 @@ class ManageTransactionActivity : AppCompatActivity() {
         AppExecutors.instance.diskIO().execute {
             if (mTransactionId != DEFAULT_TRANSACTION_ID) {
                 // delete selected mTransaction
-                Log.i("onDeleteButtonClicked", "Delete")
                 mDb.transactionDao().deleteTransactionById(mTransactionId)
             }
             finish()
@@ -303,9 +275,9 @@ class ManageTransactionActivity : AppCompatActivity() {
 
     private fun setTransactionTypeInViews(type: String) {
         when (type) {
-            EXPENSE_TRANSACTION_TYPE -> mRadioGroupType.check(R.id.radButton1)
-            INCOME_TRANSACTION_TYPE -> mRadioGroupType.check(R.id.radButton2)
-            else -> mRadioGroupType.check(R.id.radButton1)
+            EXPENSE_TRANSACTION_TYPE -> radioGroup.check(R.id.radButtonExpense)
+            INCOME_TRANSACTION_TYPE -> radioGroup.check(R.id.radButtonIncome)
+            else -> radioGroup.check(R.id.radButtonExpense)
         }
     }
 
@@ -317,7 +289,7 @@ class ManageTransactionActivity : AppCompatActivity() {
     }
 
     private fun loadRecommendedCost() {
-        var keyword = mEditTextDescription.text.toString()
+        var keyword = descriptionInput.text.toString()
         keyword = "%$keyword%"
         val bundle = Bundle()
         bundle.putString(EXTRA_DESCRIPTION_KEYWORD, keyword)

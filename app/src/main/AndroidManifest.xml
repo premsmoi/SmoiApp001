@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.smoiapp001">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -27,7 +29,7 @@
             android:screenOrientation="portrait"
             android:label="@string/add_transaction_activity_name" />
 
-        <receiver android:name=".AlarmNotificationReceiver" android:enabled="true" >
+        <receiver android:name=".receivers.AlarmNotificationReceiver" android:enabled="true" >
             <intent-filter>
                 <action android:name="com.example.smoiapp001.NOTIFICATION_ACTION" />
             </intent-filter>

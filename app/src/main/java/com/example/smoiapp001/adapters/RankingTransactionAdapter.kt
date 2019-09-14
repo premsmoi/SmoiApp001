@@ -11,9 +11,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.example.smoiapp001.R
-import com.example.smoiapp001.activities.MainActivity
 import com.example.smoiapp001.activities.fragments.DashboardFragment
 import com.example.smoiapp001.database.AppDatabase
+import kotlinx.android.synthetic.main.ranking_transaction_layout.view.*
 
 import java.util.Locale
 
@@ -67,8 +67,8 @@ class RankingTransactionAdapter(private val mContext: Context?) : RecyclerView.A
      */
     (itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val descriptionView: TextView = itemView.findViewById(R.id.tv_transaction_description)
-        val sumView: TextView = itemView.findViewById(R.id.tv_transaction_sum)
+        val descriptionView: TextView = itemView.transactionDescription
+        val sumView: TextView = itemView.transactionSum
 
     }
 

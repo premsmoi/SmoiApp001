@@ -1,4 +1,4 @@
-package com.example.smoiapp001;
+package com.example.smoiapp001.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

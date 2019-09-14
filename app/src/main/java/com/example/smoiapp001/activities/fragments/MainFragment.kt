@@ -36,18 +36,11 @@ import java.util.Locale
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
 import com.example.smoiapp001.database.models.TransactionEntry
+import kotlinx.android.synthetic.main.fragment_main.*
 
 class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
 
     private lateinit var fragmentView: View
-    private lateinit var dayCostTextView: TextView
-    private lateinit var monthCostTextView: TextView
-    private lateinit var dayAverageCostTextView: TextView
-    private lateinit var selectDateButton: Button
-    private lateinit var showAllCheckBox: CheckBox
-    private lateinit var fabButton: FloatingActionButton
-
-    private lateinit var mRecyclerView: RecyclerView
     private lateinit var mAdapter: TransactionAdapter
     private lateinit var descriptionList: ArrayList<String>
     private lateinit var viewModel: MainViewModel
@@ -59,54 +52,44 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
 
-        initViews()
-
-        if (savedInstanceState != null && savedInstanceState.containsKey("selectedDate")) {
-            selectDateButton.text = savedInstanceState.getString("selectedDate")
-        }
-
-        // Set the layout for the RecyclerView to be a linear layout, which measures and
-        // positions items within a RecyclerView into a linear list
-        mRecyclerView.layoutManager = LinearLayoutManager(context)
-        mRecyclerView.setHasFixedSize(true)
-
-        // Initialize the adapter and attach it to the RecyclerView
-        mAdapter = TransactionAdapter(context!!, this)
-        mRecyclerView.adapter = mAdapter
-
-        /*viewModel = ViewModelProviders.of(this).get(MainViewModel.class);*/
-        viewModel = (activity as MainActivity).viewModel
-
-        val decoration = DividerItemDecoration(context!!.applicationContext, VERTICAL)
-        mRecyclerView.addItemDecoration(decoration)
-
-        descriptionList = ArrayList()
-        setupViewModel()
-
         return fragmentView
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString("selectedDate", selectDateButton.text.toString())
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    private fun initViews() {
-        /* Set the RecyclerView to its corresponding view */
-        mRecyclerView = fragmentView.findViewById(R.id.recycler_view_transaction)
-        dayCostTextView = fragmentView.findViewById(R.id.tv_daily_cost)
-        monthCostTextView = fragmentView.findViewById(R.id.tv_monthly_cost)
-        dayAverageCostTextView = fragmentView.findViewById(R.id.tv_day_avg_cost)
-        showAllCheckBox = fragmentView.findViewById(R.id.checkbox_show_all)
-        showAllCheckBox.setOnCheckedChangeListener { buttonView, isChecked -> setupViewModel() }
-        selectDateButton = fragmentView.findViewById(R.id.bt_selected_date)
-        selectDateButton.text = DateUtils.getNormalDateFormat().format(Date())
-        selectDateButton.setOnClickListener { showDatePickerDialog() }
-        fabButton = fragmentView.findViewById(R.id.fab)
-
+        showAllCheckbox.setOnCheckedChangeListener { buttonView, isChecked -> setupViewModel() }
+        dateSelectionButton.text = DateUtils.getNormalDateFormat().format(Date())
+        dateSelectionButton.setOnClickListener { showDatePickerDialog() }
         fabButton.setOnClickListener {
             findNavController(this@MainFragment)
                     .navigate(R.id.action_mainFragment_to_manageTransactionActivity)
         }
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("selectedDate")) {
+            dateSelectionButton.text = savedInstanceState.getString("selectedDate")
+        }
+
+        // Set the layout for the RecyclerView to be a linear layout, which measures and
+        // positions items within a RecyclerView into a linear list
+        transactionRecyclerView.layoutManager = LinearLayoutManager(context)
+        transactionRecyclerView.setHasFixedSize(true)
+
+        // Initialize the adapter and attach it to the RecyclerView
+        mAdapter = TransactionAdapter(context!!, this)
+        transactionRecyclerView.adapter = mAdapter
+
+        viewModel = (activity as MainActivity).mainViewModel
+
+        val decoration = DividerItemDecoration(context!!.applicationContext, VERTICAL)
+        transactionRecyclerView.addItemDecoration(decoration)
+
+        descriptionList = ArrayList()
+        setupViewModel()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("selectedDate", dateSelectionButton.text.toString())
     }
 
     private fun setupViewModel() {
@@ -115,7 +98,7 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
             val selectedCalendar = getSelectedCalendar()
             descriptionList = TransactionUtils.getDescriptionList(transactionEntries!!)
 
-            if (!showAllCheckBox.isChecked) {
+            if (!showAllCheckbox.isChecked) {
                 selectedEntries = TransactionUtils.getTransactionByDate(transactionEntries, selectedCalendar)
                 mAdapter.transactions = selectedEntries
             } else {
@@ -131,33 +114,33 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
         var dayCostString = String.format(Locale.US, "%.2f", dayCost)
 
         if (dayCost < 0) {
-            dayCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
+            dailyCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
         } else {
-            dayCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
+            dailyCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
             dayCostString = "+$dayCostString"
         }
-        dayCostTextView.text = dayCostString
+        dailyCost.text = dayCostString
     }
 
     private fun setMonthCostView(monthCost: Float) {
         var monthCostString = String.format(Locale.US, "%.2f", monthCost)
 
         if (monthCost < 0) {
-            monthCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
+            monthlyCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
         } else {
-            monthCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
+            monthlyCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
             monthCostString = "+$monthCostString"
         }
-        monthCostTextView.text = monthCostString
+        monthlyCost.text = monthCostString
     }
 
     private fun setDayAverageCostView(monthCost: Float) {
         var monthCostString = ""
         val today = Date().date
         val todayMonth = Date().month
-        val selectedDay = DateUtils.getDayByNormalFormat(selectDateButton.text.toString())
-        val selectedMonth = DateUtils.getMonthByNormalFormat(selectDateButton.text.toString())
-        val selectedYear = DateUtils.getYearByNormalFormat(selectDateButton.text.toString())
+        val selectedDay = DateUtils.getDayByNormalFormat(dateSelectionButton.text.toString())
+        val selectedMonth = DateUtils.getMonthByNormalFormat(dateSelectionButton.text.toString())
+        val selectedYear = DateUtils.getYearByNormalFormat(dateSelectionButton.text.toString())
 
         if (todayMonth == selectedMonth) {
             monthCostString = String.format(Locale.US, "%.2f", monthCost / today)
@@ -168,12 +151,12 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
         }
 
         if (monthCost < 0) {
-            dayAverageCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
+            averageCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
         } else {
-            dayAverageCostTextView.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
+            averageCost.setTextColor(ContextCompat.getColor(context!!, R.color.colorGreen))
             monthCostString = "+$monthCostString"
         }
-        dayAverageCostTextView.text = monthCostString
+        averageCost.text = monthCostString
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -181,7 +164,7 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
             val result: IntArray = data!!.getIntArrayExtra("selectedDate")
             val selectedDateString = DateUtils.buildNormalDateString(result[0], result[1], result[2])
 
-            selectDateButton.text = selectedDateString
+            dateSelectionButton.text = selectedDateString
             val selectedCalendar = getSelectedCalendar()
             setDayCostView(TransactionUtils.calculateDayCost(
                     viewModel.transactions.value!!,
@@ -198,7 +181,7 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
     }
 
     private fun getSelectedCalendar(): Calendar {
-        val selectedDateString = selectDateButton.text.toString()
+        val selectedDateString = dateSelectionButton.text.toString()
         selectedCalendar = Calendar.getInstance()
         selectedCalendar.set(DateUtils.getYearByNormalFormat(selectedDateString),
                 DateUtils.getMonthByNormalFormat(selectedDateString),
@@ -208,7 +191,7 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
 
     private fun showDatePickerDialog() {
         val newFragment = DatePickerFragment()
-        val date = selectDateButton.text.toString()
+        val date = dateSelectionButton.text.toString()
         val dateBundle = Bundle()
         dateBundle.putInt("day", DateUtils.getDayByNormalFormat(date))
         dateBundle.putInt("month", DateUtils.getMonthByNormalFormat(date))

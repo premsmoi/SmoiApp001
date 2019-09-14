@@ -16,7 +16,7 @@
 
         <!-- TextView that displays the description -->
         <TextView
-            android:id="@+id/tv_transaction_description"
+            android:id="@+id/transactionDescription"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
 
         <!-- A priority circle that is colored in programmatically in the adapter code -->
         <TextView
-            android:id="@+id/tv_transaction_sum"
+            android:id="@+id/transactionSum"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

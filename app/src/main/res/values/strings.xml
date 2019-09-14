@@ -19,8 +19,10 @@
     <string name="syncronize_firebase_string">Syncronize Firebase</string>
 
     <string name="add_item_reminder_notification_title">Let\'s add your item!</string>
-    <string name="add_item_reminder_notification_body">Touch to add item now</string>
+    <string name="add_item_reminder_notification_body">Touch to open the application</string>
     <string name="main_notification_channel_name">Primary</string>
+    <string name="cost_per_day">Cost per Day</string>
+    <string name="default_date_string">DD/MM/YYYY</string>
 
     <string-array name="filter_array">
         <item>Top Count</item>

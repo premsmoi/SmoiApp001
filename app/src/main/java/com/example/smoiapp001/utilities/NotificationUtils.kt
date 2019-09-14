@@ -17,13 +17,13 @@ import java.util.*
 
 object NotificationUtils {
 
-    private val REMINDER_NOTIFICATION_ID = 101
+    private const val REMINDER_NOTIFICATION_ID = 101
 
-    private val ACTION_ADD_ITEM_INTENT_ID = 1
+    private const val ACTION_ADD_ITEM_INTENT_ID = 1
 
-    private val REMINDER_PENDING_INTENT_ID = 3417
+    private const val REMINDER_PENDING_INTENT_ID = 3417
 
-    private val REMINDER_NOTIFICATION_CH_ID = "reminder_notification_channel"
+    private const val REMINDER_NOTIFICATION_CH_ID = "reminder_notification_channel"
 
     fun remindUserToAddItem(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -43,8 +43,7 @@ object NotificationUtils {
                         context.getString(R.string.add_item_reminder_notification_body)))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setContentIntent(contentIntent(context))
-                .addAction(addNewItem(context))
-                /*.addAction(ignoreReminderAction(context))*/
+                //.addAction(addNewItem(context))
                 .setAutoCancel(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -53,7 +52,7 @@ object NotificationUtils {
         notificationManager.notify(REMINDER_NOTIFICATION_ID, notificationBuilder.build())
     }
 
-    private fun addNewItem(context: Context): NotificationCompat.Action {
+    /*private fun addNewItem(context: Context): NotificationCompat.Action {
         val addItem = Intent(context, ManageTransactionActivity::class.java)
         addItem.action = ManageTransactionActivity.ACTION_MANAGE_TRANSACTION
         val pendingAddItem = PendingIntent.getActivity(
@@ -65,7 +64,7 @@ object NotificationUtils {
                 R.drawable.common_google_signin_btn_icon_dark,
                 "Add",
                 pendingAddItem)
-    }
+    }*/
 
     private fun contentIntent(context: Context): PendingIntent {
         val startActivityIntent = Intent(context, MainActivity::class.java)
@@ -78,12 +77,14 @@ object NotificationUtils {
 
     fun loadNotification(context: Context) {
         val manager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        // SET TIME HERE
+
+        // Set time for 3 P.M. notification
         val firstCalendar = Calendar.getInstance()
         firstCalendar.set(Calendar.HOUR_OF_DAY, 15)
         firstCalendar.set(Calendar.MINUTE, 0)
         firstCalendar.set(Calendar.SECOND, 0)
 
+        // Set time for 9 P.M. notification
         val secondCalendar = Calendar.getInstance()
         secondCalendar.set(Calendar.HOUR_OF_DAY, 21)
         secondCalendar.set(Calendar.MINUTE, 0)
@@ -95,12 +96,12 @@ object NotificationUtils {
 
         val pendingIntent1 = PendingIntent.getBroadcast(context, 11, myIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val pendingIntent2 = PendingIntent.getBroadcast(context, 12, myIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        Timber.i("pendingIntent1 is $pendingIntent1")
-        Timber.i("pendingIntent2 is $pendingIntent2")
+        /*Timber.i("pendingIntent1 is ${pendingIntent1.toString()}")
+        Timber.i("pendingIntent2 is ${pendingIntent2.toString()}")*/
 
-        if (pendingIntent1 != null)
+        if (pendingIntent1 == null)
             manager.setRepeating(AlarmManager.RTC_WAKEUP, when1, AlarmManager.INTERVAL_DAY, pendingIntent1)
-        if (pendingIntent2 != null)
+        if (pendingIntent2 == null)
             manager.setRepeating(AlarmManager.RTC_WAKEUP, when2, AlarmManager.INTERVAL_DAY, pendingIntent2)
     }
 

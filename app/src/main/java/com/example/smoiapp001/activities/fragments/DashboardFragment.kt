@@ -4,14 +4,12 @@ import androidx.lifecycle.Observer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Spinner
 
 import com.example.smoiapp001.R
 import com.example.smoiapp001.activities.MainActivity
@@ -19,16 +17,13 @@ import com.example.smoiapp001.adapters.RankingTransactionAdapter
 import com.example.smoiapp001.database.AppDatabase
 import com.example.smoiapp001.utilities.DateUtils
 import com.example.smoiapp001.viewmodels.MainViewModel
+import kotlinx.android.synthetic.main.fragment_dashbaord.*
 
 import java.util.Date
 
 class DashboardFragment : Fragment() {
 
     private lateinit var fragmentView: View
-    private lateinit var filterSpinner: Spinner
-    private lateinit var mAllTimeRecyclerView: RecyclerView
-    private lateinit var mMonthlyRecyclerView: RecyclerView
-    private lateinit var mWeeklyRecyclerView: RecyclerView
     private lateinit var mAllTimeAdapter: RankingTransactionAdapter
     private lateinit var mMonthlyAdapter: RankingTransactionAdapter
     private lateinit var mWeeklyAdapter: RankingTransactionAdapter
@@ -37,34 +32,34 @@ class DashboardFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
         fragmentView = inflater.inflate(R.layout.fragment_dashbaord, container, false)
-        mAllTimeRecyclerView = fragmentView.findViewById(R.id.recycler_view_all_time_transaction)
-        mAllTimeRecyclerView.layoutManager = LinearLayoutManager(context)
-        mAllTimeRecyclerView.setHasFixedSize(true)
 
-        mMonthlyRecyclerView = fragmentView.findViewById(R.id.recycler_view_monthly_transaction)
-        mMonthlyRecyclerView.layoutManager = LinearLayoutManager(context)
-        mMonthlyRecyclerView.setHasFixedSize(true)
+        return fragmentView
+    }
 
-        mWeeklyRecyclerView = fragmentView.findViewById(R.id.recycler_view_weekly_transaction)
-        mWeeklyRecyclerView.layoutManager = LinearLayoutManager(context)
-        mWeeklyRecyclerView.setHasFixedSize(true)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        allTimeRecyclerView.layoutManager = LinearLayoutManager(context)
+        allTimeRecyclerView.setHasFixedSize(true)
 
-        filterSpinner = fragmentView.findViewById(R.id.filter_spinner)
+        monthlyRecyclerView.layoutManager = LinearLayoutManager(context)
+        monthlyRecyclerView.setHasFixedSize(true)
+
+        weeklyRecyclerView.layoutManager = LinearLayoutManager(context)
+        weeklyRecyclerView.setHasFixedSize(true)
+
         initFilterSpinner()
 
         mAllTimeAdapter = RankingTransactionAdapter(context)
         mMonthlyAdapter = RankingTransactionAdapter(context)
         mWeeklyAdapter = RankingTransactionAdapter(context)
 
-        mAllTimeRecyclerView.adapter = mAllTimeAdapter
-        mMonthlyRecyclerView.adapter = mMonthlyAdapter
-        mWeeklyRecyclerView.adapter = mWeeklyAdapter
+        allTimeRecyclerView.adapter = mAllTimeAdapter
+        monthlyRecyclerView.adapter = mMonthlyAdapter
+        weeklyRecyclerView.adapter = mWeeklyAdapter
 
-        viewModel = (activity as MainActivity).viewModel
+        viewModel = (activity as MainActivity).mainViewModel
         setupViewModel()
         loadAllMostRecordedItems()
-
-        return fragmentView
     }
 
     private fun initFilterSpinner() {

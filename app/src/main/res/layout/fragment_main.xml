@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="#ffffff">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:orientation="vertical"
         tools:context=".activities.MainActivity">
 
         <RelativeLayout
-            android:id="@+id/overall_section_layout"
+            android:id="@+id/overallSectionLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/layout_horizontal_margin">
 
             <Button
-                android:id="@+id/bt_selected_date"
+                android:id="@+id/dateSelectionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/layout_horizontal_margin"
                 android:layout_marginVertical="@dimen/layout_vertical_margin"
                 android:layout_alignParentStart="true"
                 android:textSize="@dimen/normal_text_size"
-                android:text="DD/MM/YYYY" />
+                android:text="@string/default_date_string" />
 
             <LinearLayout
-                android:id="@+id/cost_label_layout"
+                android:id="@+id/costLabelLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginHorizontal="@dimen/layout_horizontal_margin"
                 android:layout_marginVertical="@dimen/layout_vertical_margin"
-                android:layout_toLeftOf="@+id/cost_layout">
+                android:layout_toLeftOf="@+id/costLayout">
 
                 <TextView
-                    android:id="@+id/tv_daily_cost_label"
+                    android:id="@+id/dailyCostLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/layout_horizontal_margin"
@@ -47,7 +47,7 @@
                     android:text="@string/today_cost_label" />
 
                 <TextView
-                    android:id="@+id/tv_month_cost_label"
+                    android:id="@+id/monthlyCostLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/layout_horizontal_margin"
@@ -56,18 +56,18 @@
                     android:text="@string/monthly_cost_label" />
 
                 <TextView
-                    android:id="@+id/tv_day_avg_cost_label"
+                    android:id="@+id/avgCostLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/layout_horizontal_margin"
                     android:layout_marginTop="@dimen/layout_vertical_margin"
                     android:textSize="@dimen/normal_text_size"
-                    android:text="Cost per Day" />
+                    android:text="@string/cost_per_day" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/cost_layout"
+                android:id="@+id/costLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -75,43 +75,40 @@
                 android:layout_alignParentEnd="true">
 
                 <TextView
-                    android:id="@+id/tv_daily_cost"
+                    android:id="@+id/dailyCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:textSize="@dimen/Large_text_size"
-                    android:text="0" />
+                    android:textSize="@dimen/Large_text_size"/>
 
                 <TextView
-                    android:id="@+id/tv_monthly_cost"
+                    android:id="@+id/monthlyCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:textSize="@dimen/Large_text_size"
-                    android:text="0" />
+                    android:textSize="@dimen/Large_text_size"/>
 
                 <TextView
-                    android:id="@+id/tv_day_avg_cost"
+                    android:id="@+id/averageCost"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:textSize="@dimen/Large_text_size"
-                    android:text="0" />
+                    android:textSize="@dimen/Large_text_size" />
 
             </LinearLayout>
 
             <CheckBox
-                android:id="@+id/checkbox_show_all"
+                android:id="@+id/showAllCheckbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/bt_selected_date"
+                android:layout_below="@id/dateSelectionButton"
                 android:text="@string/show_all_label" />
 
         </RelativeLayout>
 
         <!-- RecyclerView that is responsible for holding a list of Transaction Entry data -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_transaction"
+            android:id="@+id/transactionRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -122,7 +119,7 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/fabButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -130,4 +127,5 @@
         android:tint="@android:color/white"
         app:srcCompat="@android:drawable/ic_input_add" />
 </FrameLayout>
+
 

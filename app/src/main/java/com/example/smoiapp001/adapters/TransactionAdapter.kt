@@ -28,6 +28,7 @@ import android.widget.TextView
 import com.example.smoiapp001.R
 import com.example.smoiapp001.database.models.TransactionEntry
 import com.example.smoiapp001.utilities.DateUtils
+import kotlinx.android.synthetic.main.transaction_layout.view.*
 import java.util.Locale
 
 /**
@@ -119,9 +120,9 @@ class TransactionAdapter
     (itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         // Class variables for the task description and priority TextViews
-        var descriptionView: TextView = itemView.findViewById(R.id.tv_transaction_description)
-        var updatedAtView: TextView = itemView.findViewById(R.id.tv_transaction_updated_at)
-        var costView: TextView = itemView.findViewById(R.id.tv_transaction_cost)
+        var descriptionView: TextView = itemView.transactionDescription
+        var updatedAtView: TextView = itemView.transactionDate
+        var costView: TextView = itemView.transactionCost
 
         init {
             itemView.setOnClickListener(this)

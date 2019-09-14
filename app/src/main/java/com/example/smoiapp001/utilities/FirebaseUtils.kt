@@ -17,7 +17,7 @@ import android.R.id.edit
 import java.util.*
 
 
-val PREFERENCE_NAME = "my_preferances"
+const val PREFERENCE_NAME = "my_preferances"
 
 
 object FirebaseUtils {
@@ -40,13 +40,12 @@ object FirebaseUtils {
             }
 
             if (!TransactionUtils.isLocked(transaction)) {
-                //Log.i(TAG, "It's not locked, what about next one?");
                 continue
             } else {
                 /*Timber.i("It's locked!");*/
             }
-            Timber.i(transactionDate.toString())
-            Timber.i("Item is ready to be synced")
+            //Timber.i(transactionDate.toString())
+            //Timber.i("Item is ready to be synced")
 
             val transactionObj = transaction.toMap()
             val transactionsRef = firebaseDB.child("transactions")
@@ -58,7 +57,7 @@ object FirebaseUtils {
                         transactionsRef.push().setValue(transactionObj)
                         editor.putLong("lastSyncTime", DateUtils.getCurrentTimeStamp());
                         editor.commit();
-                        Timber.i("not exist and locked, let's add new one");
+                        Timber.i("sync %s to Firebase", transaction.description);
                     }
                 }
 
