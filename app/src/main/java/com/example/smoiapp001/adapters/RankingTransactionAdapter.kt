@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.example.smoiapp001.R
-import com.example.smoiapp001.activities.fragments.DashboardFragment
+import com.example.smoiapp001.fragments.DashboardFragment
 import com.example.smoiapp001.database.AppDatabase
 import kotlinx.android.synthetic.main.ranking_transaction_layout.view.*
 

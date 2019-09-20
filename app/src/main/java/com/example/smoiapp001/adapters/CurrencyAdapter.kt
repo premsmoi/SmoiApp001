@@ -31,10 +31,10 @@ class CurrencyAdapter(private val mContext: Context?) : RecyclerView.Adapter<Cur
         Timber.i("position: "+position)
         val currency =  currencies.get(position)
         val label = currency.label
-        holder.label.setText(label)
+        holder.label.text = label
         holder.flagIcon.setImageResource(getFlagIconSource(label))
-        val rateString = String.format("%.2f THB", (1/currency.rate))
-        holder.rate.setText(rateString)
+        val rateString = String.format("%.4f THB", (1/currency.rate))
+        holder.rate.text = rateString
     }
 
     fun setCurrencies(currencies: ArrayList<Currency>) {

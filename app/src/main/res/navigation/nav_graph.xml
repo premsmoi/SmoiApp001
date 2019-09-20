@@ -17,7 +17,7 @@
     </activity>
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.smoiapp001.activities.fragments.MainFragment"
+        android:name="com.example.smoiapp001.fragments.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action

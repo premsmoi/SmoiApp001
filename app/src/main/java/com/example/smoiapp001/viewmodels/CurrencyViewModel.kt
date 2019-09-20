@@ -1,16 +1,19 @@
 package com.example.smoiapp001.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.smoiapp001.models.Currency
+import com.example.smoiapp001.utilities.AppExecutors
+import com.example.smoiapp001.utilities.NetworkUtils
 
-class CurrencyViewModel(application: Application) : AndroidViewModel(application) {
+class CurrencyViewModel() : ViewModel() {
 
-    var currencies: MutableLiveData<ArrayList<Currency>>
+    var currencies: MutableLiveData<ArrayList<Currency>> = MutableLiveData()
 
     init {
-        currencies = MutableLiveData()
+        AppExecutors.instance.networkIO().execute() {
+            currencies.postValue(NetworkUtils.getCurrencies())
+        }
     }
 
 }

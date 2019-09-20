@@ -1,16 +1,13 @@
-package com.example.smoiapp001.activities.fragments
+package com.example.smoiapp001.fragments
 
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-
-import androidx.fragment.app.DialogFragment
-
 import android.widget.DatePicker
-
-import java.util.Calendar
+import androidx.fragment.app.DialogFragment
+import java.util.*
 
 
 class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {

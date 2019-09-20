@@ -1,16 +1,14 @@
-package com.example.smoiapp001.activities.fragments
+package com.example.smoiapp001.fragments
 
-import androidx.lifecycle.Observer
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smoiapp001.R
 import com.example.smoiapp001.activities.MainActivity
 import com.example.smoiapp001.adapters.RankingTransactionAdapter
@@ -18,10 +16,11 @@ import com.example.smoiapp001.database.AppDatabase
 import com.example.smoiapp001.utilities.DateUtils
 import com.example.smoiapp001.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.fragment_dashbaord.*
+import java.util.*
 
-import java.util.Date
+class DashboardFragment() : Fragment(), PagerFragment {
 
-class DashboardFragment : Fragment() {
+    private val name = "Dashboard"
 
     private lateinit var fragmentView: View
     private lateinit var mAllTimeAdapter: RankingTransactionAdapter
@@ -61,6 +60,8 @@ class DashboardFragment : Fragment() {
         setupViewModel()
         loadAllMostRecordedItems()
     }
+
+    override fun getName() = name
 
     private fun initFilterSpinner() {
         val dataAdapter = ArrayAdapter.createFromResource(activity!!.applicationContext,
@@ -127,7 +128,6 @@ class DashboardFragment : Fragment() {
     }
 
     companion object {
-        const val NAME = "Dashboard"
         const val TOP_NUMBER = 5
         const val SPINNER_COUNT_POSITION = 0
         const val SPINNER_COST_POSITION = 1

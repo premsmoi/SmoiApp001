@@ -1,20 +1,12 @@
 package com.example.smoiapp001.utilities
 
-import androidx.lifecycle.ViewModel
+import android.content.Context
 import com.example.smoiapp001.viewmodels.MainViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import timber.log.Timber
-import android.R.attr.mode
-import android.R.attr.name
-import android.content.Context
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
-import com.google.android.gms.common.util.SharedPreferencesUtils
-import android.R.id.edit
-import java.util.*
 
 
 const val PREFERENCE_NAME = "my_preferances"
@@ -30,7 +22,7 @@ object FirebaseUtils {
         /*editor.putLong("lastSyncTime", 1567768906967);
         editor.commit();*/
         val lastSyncTime = sp.getLong("lastSyncTime", 0)
-        Timber.i("lastSyncTime is "+lastSyncTime)
+        Timber.i("lastSyncTime is %s", lastSyncTime.toString())
         /*Timber.i("Now is "+DateUtils.getCurrectTimeStamp())*/
 
         for (transaction in transactionEntries!!) {

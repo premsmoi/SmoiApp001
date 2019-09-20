@@ -1,13 +1,12 @@
 package com.example.smoiapp001.database
 
+import android.content.Context
+import android.database.Cursor
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import android.content.Context
-import android.database.Cursor
 import com.example.smoiapp001.database.models.TransactionEntry
-
 import com.example.smoiapp001.utilities.DateUtils
 import timber.log.Timber
 
@@ -19,7 +18,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
 
-        private val LOG_TAG = AppDatabase::class.java.simpleName
         private val LOCK = Any()
         private val DATABASE_NAME = "smoi_app_001"
         @Volatile private var sInstance: AppDatabase? = null

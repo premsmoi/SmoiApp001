@@ -1,18 +1,20 @@
 package com.example.smoiapp001.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-
+import androidx.lifecycle.ViewModel
+import com.example.smoiapp001.MyApplication
 import com.example.smoiapp001.database.AppDatabase
 import com.example.smoiapp001.database.models.TransactionEntry
+import javax.inject.Inject
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MainViewModel() : ViewModel() {
 
+    @Inject
+    lateinit var database: AppDatabase
     val transactions: LiveData<List<TransactionEntry>>
 
     init {
-        val database = AppDatabase.getInstance(this.getApplication())
+        MyApplication.mAppComponent.inject(this)
         transactions = database.transactionDao().loadAllTransactions()
     }
 

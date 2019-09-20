@@ -4,15 +4,10 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-
 import com.example.smoiapp001.R
 import com.example.smoiapp001.activities.MainActivity
-import com.example.smoiapp001.activities.ManageTransactionActivity
-import timber.log.Timber
 import java.util.*
 
 object NotificationUtils {
@@ -99,10 +94,8 @@ object NotificationUtils {
         /*Timber.i("pendingIntent1 is ${pendingIntent1.toString()}")
         Timber.i("pendingIntent2 is ${pendingIntent2.toString()}")*/
 
-        if (pendingIntent1 == null)
-            manager.setRepeating(AlarmManager.RTC_WAKEUP, when1, AlarmManager.INTERVAL_DAY, pendingIntent1)
-        if (pendingIntent2 == null)
-            manager.setRepeating(AlarmManager.RTC_WAKEUP, when2, AlarmManager.INTERVAL_DAY, pendingIntent2)
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, when1, AlarmManager.INTERVAL_DAY, pendingIntent1)
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, when2, AlarmManager.INTERVAL_DAY, pendingIntent2)
     }
 
 }

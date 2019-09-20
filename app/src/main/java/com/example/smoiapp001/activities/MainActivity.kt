@@ -8,9 +8,14 @@ import androidx.core.content.ContextCompat
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.fragment.app.Fragment
+import com.example.smoiapp001.MyApplication
 
 import com.example.smoiapp001.adapters.PagerAdapter
 import com.example.smoiapp001.R
+import com.example.smoiapp001.fragments.CurrencyFragment
+import com.example.smoiapp001.fragments.DashboardFragment
+import com.example.smoiapp001.fragments.MainFragment
 import com.example.smoiapp001.utilities.FirebaseUtils
 import com.example.smoiapp001.utilities.NotificationUtils
 import com.example.smoiapp001.viewmodels.MainViewModel
@@ -19,17 +24,31 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 
 
 import timber.log.Timber
-
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var mainViewModel: MainViewModel
 
+    @Inject
+    lateinit var mainFragment: MainFragment
+    @Inject
+    lateinit var dashboardFragment: DashboardFragment
+    @Inject
+    lateinit var currencyFragment: CurrencyFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val pagerAdapter = PagerAdapter(supportFragmentManager)
+        MyApplication.mAppComponent.inject(this)
+
+        val fragmentList = arrayOf(
+                mainFragment as Fragment,
+                dashboardFragment as Fragment,
+                currencyFragment as Fragment)
+
+        val pagerAdapter = PagerAdapter(supportFragmentManager, fragmentList)
         pager.adapter = pagerAdapter
         pager.currentItem = 0
 

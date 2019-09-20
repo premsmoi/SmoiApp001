@@ -1,63 +1,51 @@
-package com.example.smoiapp001.activities.fragments
+package com.example.smoiapp001.fragments
 
 import android.app.Activity
-
-import androidx.lifecycle.Observer
-
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.TextView
-
-import com.example.smoiapp001.utilities.DateUtils
-import com.example.smoiapp001.viewmodels.MainViewModel
-import com.example.smoiapp001.R
-import com.example.smoiapp001.adapters.TransactionAdapter
-import com.example.smoiapp001.activities.MainActivity
-import com.example.smoiapp001.utilities.TransactionUtils
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-
-import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
-import java.util.GregorianCalendar
-import java.util.Locale
-
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.smoiapp001.MyApplication
+import com.example.smoiapp001.R
+import com.example.smoiapp001.activities.MainActivity
+import com.example.smoiapp001.adapters.TransactionAdapter
 import com.example.smoiapp001.database.models.TransactionEntry
+import com.example.smoiapp001.utilities.DateUtils
+import com.example.smoiapp001.utilities.TransactionUtils
+import com.example.smoiapp001.viewmodels.MainViewModel
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.*
+import javax.inject.Inject
 
-class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
+class MainFragment() : Fragment(), PagerFragment, TransactionAdapter.ItemClickListener {
 
-    private lateinit var fragmentView: View
-    private lateinit var mAdapter: TransactionAdapter
+    private val name = "Main"
+
     private lateinit var descriptionList: ArrayList<String>
     private lateinit var viewModel: MainViewModel
     private lateinit var selectedCalendar: Calendar
+
+    @Inject
+    lateinit var mAdapter: TransactionAdapter
 
     private val requestCode = 11 // Used to identify the result
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        fragmentView = inflater.inflate(R.layout.fragment_main, container, false)
-
-        return fragmentView
+        return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        MyApplication.mAppComponent.inject(this)
         showAllCheckbox.setOnCheckedChangeListener { buttonView, isChecked -> setupViewModel() }
         dateSelectionButton.text = DateUtils.getNormalDateFormat().format(Date())
         dateSelectionButton.setOnClickListener { showDatePickerDialog() }
@@ -92,9 +80,11 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
         outState.putString("selectedDate", dateSelectionButton.text.toString())
     }
 
+    override fun getName() = name
+
     private fun setupViewModel() {
         viewModel.transactions.observe(this, Observer { transactionEntries ->
-            val selectedEntries: ArrayList<TransactionEntry>
+            val selectedEntries: List<TransactionEntry>
             val selectedCalendar = getSelectedCalendar()
             descriptionList = TransactionUtils.getDescriptionList(transactionEntries!!)
 
@@ -206,10 +196,6 @@ class MainFragment : Fragment(), TransactionAdapter.ItemClickListener {
                 = MainFragmentDirections.actionMainFragmentToManageTransactionActivity()
         action.itemId = itemId
         findNavController(this).navigate(action)
-    }
-
-    companion object {
-        const val NAME = "Main"
     }
 
 }
